@@ -3,10 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/Jelajah/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.153" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1475" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/drawable/rounded.xml" value="0.153" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/layout/activity_main_menu.xml" value="0.25" />
+        <entry key="..\:/Android/Jelajah/app/src/main/res/layout/activity_quran.xml" value="0.16983695652173914" />
+        <entry key="..\:/Android/Jelajah/app/src/main/res/layout/fragment_main_menu.xml" value="0.16983695652173914" />
+        <entry key="..\:/Android/Jelajah/app/src/main/res/layout/fragment_surah.xml" value="0.25" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/layout/item_menu.xml" value="0.16983695652173914" />
+        <entry key="..\:/Android/Jelajah/app/src/main/res/menu/bottom_nav_quran.xml" value="0.18333333333333332" />
+        <entry key="..\:/Android/Jelajah/app/src/main/res/menu/nav_draw_quran.xml" value="0.18333333333333332" />
       </map>
     </option>
   </component>

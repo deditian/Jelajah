@@ -14,8 +14,18 @@ class QuranFragment : Fragment() {
 
     private val viewModel: QuranViewModel by activityViewModels()
     private val TAG = this::class.java.simpleName
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_quran, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel._surah()
         viewModel.responseSurah.observe(viewLifecycleOwner){
             when(it) {
@@ -30,14 +40,6 @@ class QuranFragment : Fragment() {
                 }
             }
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_surah, container, false)
     }
 
 }

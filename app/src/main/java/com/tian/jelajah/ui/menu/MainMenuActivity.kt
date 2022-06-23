@@ -1,6 +1,6 @@
 package com.tian.jelajah.ui.menu
 
-import android.Manifest
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.AlertDialog
 import android.content.Intent
@@ -13,10 +13,13 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.recyclerview.widget.GridLayoutManager
 import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.hideProgress
@@ -27,18 +30,21 @@ import com.google.android.gms.tasks.Task
 import com.tian.jelajah.R
 import com.tian.jelajah.databinding.ActivityMainMenuBinding
 import com.tian.jelajah.model.Menus
+import com.tian.jelajah.utils.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
-
+import androidx.navigation.fragment.findNavController
+import com.tian.jelajah.ui.quran.QuranActivity
+import com.tian.jelajah.utils.gotoActivity
 
 class MainMenuActivity : AppCompatActivity() {
     lateinit var binding : ActivityMainMenuBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val REQUEST_LOCATION_PERMISSION = 10100
-    val PERMISSION_ID = 42
+    private val PERMISSION_ID = 42
     //    private val viewModel: SurahViewModel by viewModels()
     private val TAG = this::class.java.simpleName
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,16 +52,14 @@ class MainMenuActivity : AppCompatActivity() {
         binding = ActivityMainMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+
         binding.rvMenus.apply {
-            layoutManager = GridLayoutManager(this@MainMenuActivity, 2)
+            layoutManager = GridLayoutManager(context, 2)
             adapter = this@MainMenuActivity.adapter
         }
 
-    }
-
-
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
         setItemMenu()
     }
 
@@ -64,12 +68,51 @@ class MainMenuActivity : AppCompatActivity() {
         findLocation()
     }
 
+    private fun setItemMenu() {
+        val array = ArrayList<Menus>()
+        array.add(Menus(Color.BLUE, "Al-Quran"))
+        array.add(Menus(Color.GREEN, "Doa-doa"))
+        array.add(Menus(Color.RED, "Puasa Sunah"))
+        array.add(Menus(Color.CYAN, "Berita"))
+        array.add(Menus(Color.MAGENTA, "Pesantren di Indonesia"))
+        array.add(Menus(Color.YELLOW, "Pahlawan Nasional Indonesia"))
+        adapter.submitList(array)
+    }
 
-    fun findLocation() {
+    private val adapter = MainMenuAdapter().apply {
+        listener = object : MainMenuAdapter.RecyclerViewClickListener {
+            override fun onItemClicked(view: View, item: Menus) {
+
+                when (item.name){
+                    Constants.QURAN ->{
+                        gotoActivity(QuranActivity::class)
+                    }
+                    Constants.DOA ->{
+
+                    }
+                    Constants.PUASA ->{
+
+                    }
+                    Constants.BERITA ->{
+
+                    }
+                    Constants.PESANTREN ->{
+
+                    }
+                    Constants.PAHLAWAN ->{
+
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun findLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@MainMenuActivity)
         if (checkPermission(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ACCESS_COARSE_LOCATION,
+                ACCESS_FINE_LOCATION)) {
             fusedLocationClient?.lastLocation?.
             addOnSuccessListener(this
             ) { location: Location? ->
@@ -207,24 +250,6 @@ class MainMenuActivity : AppCompatActivity() {
     private fun checkLocationPermission() : Boolean = (ContextCompat.checkSelfPermission(
         this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
 
-    private fun setItemMenu() {
-        val array = ArrayList<Menus>()
-        array.add(Menus(Color.BLUE, "Al-Quran"))
-        array.add(Menus(Color.GREEN, "Doa-doa"))
-        array.add(Menus(Color.RED, "Puasa Sunah"))
-        array.add(Menus(Color.CYAN, "Berita"))
-        array.add(Menus(Color.MAGENTA, "Pesantren di Indonesia"))
-        array.add(Menus(Color.YELLOW, "Pahlawan Nasional Indonesia"))
-        adapter.submitList(array)
-    }
-
-    private val adapter = MainMenuAdapter().apply {
-        listener = object : MainMenuAdapter.RecyclerViewClickListener {
-            override fun onItemClicked(view: View, item: Menus) {
-
-            }
-        }
-    }
 
     private val locationUpdates = object : LocationCallback() {
         override fun onLocationResult(lr: LocationResult) {

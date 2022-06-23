@@ -2,9 +2,11 @@
     <string name="app_name">Jelajah</string>
 
     <string name="salam">Assalamu`alaikum</string>
-    <string name="location">Tangerang</string>
+    <string name="location">Lokasi kamu…</string>
     <string name="ket_waktu">Waktu Ibadah Selanjutnya</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dialog_location_explanation">dialog location_explanation</string>
     <string name="find_location">Find Location…</string>
+    <string name="surah">Surah</string>
+    <string name="favorite_surah">Surah Favorite</string>
 </resources>

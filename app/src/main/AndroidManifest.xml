@@ -4,6 +4,11 @@
     package="com.tian.jelajah">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
 
     <application
         android:name=".App"
@@ -12,11 +17,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Jelajah"
+        android:theme="@style/Theme.Jelajah.NoActionBar"
         tools:ignore="Instantiatable"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.MainMenuActivity"
+            android:name=".ui.menu.MainMenuActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

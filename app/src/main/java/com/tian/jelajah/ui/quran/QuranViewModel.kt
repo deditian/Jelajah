@@ -1,4 +1,4 @@
-package com.tian.jelajah.ui.surah
+package com.tian.jelajah.ui.quran
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.tian.jelajah.repositories.QuranRepository
 import kotlinx.coroutines.launch
 
-class SurahViewModel : ViewModel() {
+class QuranViewModel : ViewModel() {
 
     private val repository = QuranRepository()
 

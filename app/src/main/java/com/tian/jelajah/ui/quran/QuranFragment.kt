@@ -1,25 +1,23 @@
-package com.tian.jelajah.ui
+package com.tian.jelajah.ui.quran
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import com.tian.jelajah.R
-import com.tian.jelajah.databinding.ActivityMainMenuBinding
 import com.tian.jelajah.repositories.ApiResponse
-import com.tian.jelajah.ui.surah.SurahViewModel
-import com.tian.jelajah.utils.obtainViewModel
 
-class MainMenuActivity : AppCompatActivity() {
-    lateinit var binding : ActivityMainMenuBinding
-    private val viewModel by obtainViewModel(SurahViewModel::class)
+class QuranFragment : Fragment() {
+
+    private val viewModel: QuranViewModel by activityViewModels()
     private val TAG = this::class.java.simpleName
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainMenuBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         viewModel._surah()
-
-        viewModel.responseSurah.observe(this){
+        viewModel.responseSurah.observe(viewLifecycleOwner){
             when(it) {
                 is ApiResponse.Error -> {
                     Log.e(TAG, "onCreate error: ${it.error}" )
@@ -33,4 +31,13 @@ class MainMenuActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_surah, container, false)
+    }
+
 }

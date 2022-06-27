@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.tian.jelajah.di.AppModule
-import com.tian.jelajah.model.GeneralResponse
-import com.tian.jelajah.model.Surah
-import com.tian.jelajah.model.SurahListResponse
+import com.tian.jelajah.model.*
+import com.tian.jelajah.utils.convertToList
+import com.tian.jelajah.utils.dateFormat
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,16 +15,50 @@ import java.util.*
 import kotlin.reflect.KClass
 
 
-class QuranRepository {
+class CommonRepository {
 
-    private val apiTechService = AppModule.getInstance()
+    private val apiService = AppModule.getInstance()
+
+    fun getJadwalSholat(latAndLong : String) : LiveData<ApiResponse<List<Prayer>>> {
+        val result = MutableLiveData<ApiResponse<List<Prayer>>>()
+
+        result.value = ApiResponse.Loading
+        val dates = dateFormat("yyyy-MM-dd").split("-")
+        val latlong = latAndLong.split("|")
+        val lat = latlong[0].toDouble()
+        val longi = latlong[1].toDouble()
+
+        apiService.provideApiJadwalService().getJadwalSholat(lat, longi,
+            dates[0].toInt(), dates[1].toInt(),
+            dates[2].toInt()).enqueue(enqueue(JadwalSholatResponse::class, { it ->
+            try {
+                val list = ArrayList<Prayer>()
+                it.let {
+                    it.data.forEach { jadwal ->
+                        list.addAll(jadwal.convertToList())
+                    }
+                }
+                val prayers = list.filter { it.date == dates.joinToString("-") }
+                Log.e("TAG", "getJadwal: ${prayers}" )
+                result.value = ApiResponse.Success(prayers)
+            } catch (e: Exception) {
+                result.value = ApiResponse.Error(it)
+            }
+
+
+        }, {
+            result.value = ApiResponse.Error(it)
+        }))
+
+        return result
+    }
 
     fun getListSurah() : LiveData<ApiResponse<List<Surah>>> {
         val result = MutableLiveData<ApiResponse<List<Surah>>>()
 
         result.value = ApiResponse.Loading
 
-        apiTechService.provideApiTechService().getListSurah().enqueue(enqueue(SurahListResponse::class, {
+        apiService.provideApiQuranService().getListSurah().enqueue(enqueue(SurahListResponse::class, {
             Log.e("TAG", "getListSurah: $it" )
             result.value = ApiResponse.Success(it.data)
         }, {
@@ -40,7 +74,7 @@ class QuranRepository {
                 Log.e("TAG", "onResponse response.body:: ${response.body()}" )
                 val generalResponse = Gson().fromJson(response.body(), GeneralResponse::class.java)
                 val responseStatus = generalResponse.status
-                if ("200".equals(responseStatus, ignoreCase = true)) {
+                if ("success".equals(responseStatus, ignoreCase = true) || "200".equals(responseStatus, ignoreCase = true)) {
                     val r : T = Gson().fromJson(response.body(), clazz.java)
                     Log.e("Repo", "$r")
                     callSuccess.invoke(r)

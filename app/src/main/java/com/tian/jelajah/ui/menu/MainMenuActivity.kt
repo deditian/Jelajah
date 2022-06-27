@@ -2,6 +2,9 @@ package com.tian.jelajah.ui.menu
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.IntentSender
@@ -10,16 +13,17 @@ import android.graphics.Color
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.doOnEnd
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.recyclerview.widget.GridLayoutManager
 import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.hideProgress
@@ -29,24 +33,30 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.tian.jelajah.R
 import com.tian.jelajah.databinding.ActivityMainMenuBinding
+import com.tian.jelajah.model.DataJadwal
+import com.tian.jelajah.model.JadwalSholatRequest
 import com.tian.jelajah.model.Menus
-import com.tian.jelajah.utils.Constants
+import com.tian.jelajah.model.Prayer
+import com.tian.jelajah.repositories.ApiResponse
+import com.tian.jelajah.ui.quran.QuranActivity
+import com.tian.jelajah.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.util.*
-import androidx.navigation.fragment.findNavController
-import com.tian.jelajah.ui.quran.QuranActivity
-import com.tian.jelajah.utils.gotoActivity
 
 class MainMenuActivity : AppCompatActivity() {
     lateinit var binding : ActivityMainMenuBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val REQUEST_LOCATION_PERMISSION = 10100
     private val PERMISSION_ID = 42
-    //    private val viewModel: SurahViewModel by viewModels()
+    private val viewModel: MainMenuViewModel by viewModels()
     private val TAG = this::class.java.simpleName
+    private var countDownTimer: CountDownTimer? = null
+    private var prayers: List<Prayer>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainMenuBinding.inflate(layoutInflater)
@@ -61,7 +71,85 @@ class MainMenuActivity : AppCompatActivity() {
         }
 
         setItemMenu()
+
+
+        viewModel.responseJadwalSholat.observe(this){
+            when(it) {
+                is ApiResponse.Error -> {
+                    Log.e(TAG, "onCreate error: ${it.error}" )
+                }
+                ApiResponse.Loading -> {
+
+                }
+                is ApiResponse.Success -> {
+                    prayers = it.data.run {
+                        val prayers = ArrayList<Prayer>()
+                        forEach { prayer ->  prayers.add(prayer) }
+                        return@run prayers
+                    }
+                    updatePrayer(it.data)
+                }
+            }
+        }
     }
+
+
+
+    private fun updatePrayer(prayer : List<Prayer>) {
+        prayer.forEach {
+            if (it.time.isValid()) {
+                val string = "${getStringWithNameId(it.name)} ${dateFormat("HH:mm", it.time)}"
+                binding.txtTimePrayer.text = string
+                countDownTimer?.cancel()
+                countDownTimer = null
+                runCountDown(it.time)
+                return
+            }
+        }
+    }
+
+    private fun runCountDown(time: Long?) {
+        val countTimeLong: Long
+        val dNow = Date()
+        if (time == null) return else {
+            if (time <= dNow.time) return
+            countTimeLong = time - dNow.time
+        }
+
+        if (countDownTimer != null) return
+
+        countDownTimer = object : CountDownTimer(countTimeLong, 1000L) {
+            override fun onTick(elapsedTime: Long) {
+                binding.txtCountdownPrayer.text = createTimeString(elapsedTime)
+            }
+
+            override fun onFinish() {
+                nowTimePrayer {
+                    updatePrayer(prayers!!)
+                }
+            }
+        }
+        countDownTimer?.start()
+    }
+
+    private fun nowTimePrayer(callbackFinish: () -> Unit) {
+        binding.materialTextView2.setText(R.string.now_time_prayer)
+        val colorTo = binding.txtCountdownPrayer.currentTextColor
+        ValueAnimator.ofObject(ArgbEvaluator(), Color.TRANSPARENT, colorTo).apply {
+            duration = 500L
+            repeatCount = 10000 / duration.toInt()
+            repeatMode = ValueAnimator.REVERSE
+            addUpdateListener {
+                if (it.animatedValue is Int) binding.txtCountdownPrayer.setTextColor(it.animatedValue as Int)
+            }
+            this.doOnEnd {
+                callbackFinish.invoke()
+                binding.materialTextView2.setText(R.string.next_time_prayer)
+            }
+            start()
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -70,12 +158,12 @@ class MainMenuActivity : AppCompatActivity() {
 
     private fun setItemMenu() {
         val array = ArrayList<Menus>()
-        array.add(Menus(Color.BLUE, "Al-Quran"))
-        array.add(Menus(Color.GREEN, "Doa-doa"))
-        array.add(Menus(Color.RED, "Puasa Sunah"))
-        array.add(Menus(Color.CYAN, "Berita"))
-        array.add(Menus(Color.MAGENTA, "Pesantren di Indonesia"))
-        array.add(Menus(Color.YELLOW, "Pahlawan Nasional Indonesia"))
+        array.add(Menus(Color.WHITE, "Al-Quran"))
+        array.add(Menus(Color.WHITE, "Doa-doa"))
+        array.add(Menus(Color.WHITE, "Puasa Sunah"))
+        array.add(Menus(Color.WHITE, "Berita"))
+        array.add(Menus(Color.WHITE, "Pesantren di Indonesia"))
+        array.add(Menus(Color.WHITE, "Pahlawan Nasional Indonesia"))
         adapter.submitList(array)
     }
 
@@ -113,7 +201,7 @@ class MainMenuActivity : AppCompatActivity() {
         if (checkPermission(
                 ACCESS_COARSE_LOCATION,
                 ACCESS_FINE_LOCATION)) {
-            fusedLocationClient?.lastLocation?.
+            fusedLocationClient.lastLocation.
             addOnSuccessListener(this
             ) { location: Location? ->
                 // Got last known location. In some rare
@@ -135,9 +223,13 @@ class MainMenuActivity : AppCompatActivity() {
                     try {
                         val lat = location.latitude
                         val longi = location.longitude
+                        val latAndLong = "$lat|$longi"
+//                        val jadwalSholatRequest = JadwalSholatRequest(lat,longi, 2022,6,23)
+                        viewModel._jadwalSholat(latAndLong)
                         Log.e(TAG, "onCreate: $lat")
                         val addresses = geocoder.getFromLocation(lat, longi, 1)
-                        val cityName = addresses[0].locality
+//                        val cityName = addresses[0].locality
+                        val cityName = addresses[0].adminArea
                         Log.e(TAG, "onLocationChanged: $cityName")
                         CoroutineScope(Dispatchers.Main).launch {
                             binding.txtCurrentLocation.let { btn ->
@@ -262,10 +354,10 @@ class MainMenuActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         stopPeriodic()
+        countDownTimer?.cancel()
     }
 
     private fun stopPeriodic() {
-        fusedLocationClient?.
-        removeLocationUpdates(locationUpdates)
+        fusedLocationClient.removeLocationUpdates(locationUpdates)
     }
 }

@@ -1,5 +1,7 @@
 package com.tian.jelajah.model
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 
 open class GeneralResponse() {

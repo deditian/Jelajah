@@ -1,0 +1,24 @@
+package com.tian.jelajah.model
+
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+
+
+//@Entity(tableName = "prayer")
+@Parcelize
+data class Prayer(
+//        @PrimaryKey(autoGenerate = true)
+        var id: Int = 0,
+        val time: Long,
+        val name: String,
+        val backgroundColor: Int,
+        val date: String,
+        val type: String,
+//        @Ignore
+        val alarm: Boolean = false,
+) : Parcelable {
+
+    constructor(time: Long, name: String, backgroundColor: Int, date: String, type: String) : this(0, time, name, backgroundColor, date, type, false)
+}
+

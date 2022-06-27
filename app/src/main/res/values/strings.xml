@@ -3,10 +3,21 @@
 
     <string name="salam">Assalamu`alaikum</string>
     <string name="location">Lokasi kamu…</string>
-    <string name="ket_waktu">Waktu Ibadah Selanjutnya</string>
+    <string name="next_time_prayer">Waktu Ibadah Selanjutnya</string>
+    <string name="now_time_prayer">Sekarang Waktu Ibadah</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dialog_location_explanation">dialog location_explanation</string>
     <string name="find_location">Find Location…</string>
     <string name="surah">Surah</string>
     <string name="favorite_surah">Surah Favorite</string>
+
+    <string name="adzan">Adhan</string>
+    <string name="imsak">Imsak</string>
+    <string name="fajr">Fajr</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="dhuha">Dhuha</string>
+    <string name="dhuhr">Dhuhur</string>
+    <string name="asr">Ashar</string>
+    <string name="maghrib">Maghrib</string>
+    <string name="isha">Isha</string>
 </resources>

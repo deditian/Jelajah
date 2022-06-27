@@ -64,13 +64,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
-                android:text="@string/ket_waktu"
+                android:text="@string/next_time_prayer"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/materialTextView3"
+                android:id="@+id/txt_time_prayer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -82,14 +82,15 @@
 
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/txt_countdown_prayer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="01:00:00"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@+id/materialTextView3"
-                app:layout_constraintTop_toBottomOf="@+id/materialTextView3" />
+                app:layout_constraintStart_toStartOf="@+id/txt_time_prayer"
+                app:layout_constraintTop_toBottomOf="@+id/txt_time_prayer" />
 
             <ImageView
                 android:layout_width="wrap_content"

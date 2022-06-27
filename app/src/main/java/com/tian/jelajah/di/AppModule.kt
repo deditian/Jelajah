@@ -30,7 +30,11 @@ class AppModule {
         }
     }
 
-    fun provideApiTechService(): ApiServices {
+    fun provideApiJadwalService(): ApiServices {
+        return buildClient(BuildConfig.BASE_URL_JADWAL).create(ApiServices::class.java)
+    }
+
+    fun provideApiQuranService(): ApiServices {
         return buildClient(BuildConfig.BASE_URL_QURAN).create(ApiServices::class.java)
     }
 

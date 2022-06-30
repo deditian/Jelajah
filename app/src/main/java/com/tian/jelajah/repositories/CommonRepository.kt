@@ -1,29 +1,33 @@
 package com.tian.jelajah.repositories
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.di.AppModule
 import com.tian.jelajah.model.*
 import com.tian.jelajah.utils.convertToList
 import com.tian.jelajah.utils.dateFormat
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import retrofit2.*
 import java.util.*
 import kotlin.reflect.KClass
 
 
-class CommonRepository {
+class CommonRepository (application: Application) {
 
     private val apiService = AppModule.getInstance()
+    private var preference = Preference(application)
+
 
     fun getJadwalSholat(latAndLong : String) : LiveData<ApiResponse<List<Prayer>>> {
         val result = MutableLiveData<ApiResponse<List<Prayer>>>()
 
         result.value = ApiResponse.Loading
         val dates = dateFormat("yyyy-MM-dd").split("-")
+        preference.locationLatLongi = latAndLong
         val latlong = latAndLong.split("|")
         val lat = latlong[0].toDouble()
         val longi = latlong[1].toDouble()
@@ -51,6 +55,42 @@ class CommonRepository {
         }))
 
         return result
+    }
+
+    fun loadApiPrayer(date: String) : List<Prayer>? {
+        val dates = date.split("-")
+        return try {
+            val location = preference.locationLatLongi
+            val latlong = location?.split("|")
+            val lat = latlong!![0].toDouble()
+            val longi = latlong[1].toDouble()
+            val list = ArrayList<Prayer>()
+            apiService.provideApiJadwalService().getJadwalSholat(lat, longi,
+                dates[0].toInt(), dates[1].toInt(),
+                dates[2].toInt()).enqueue(enqueue(JadwalSholatResponse::class, { it ->
+
+                try {
+                    it.let {
+                        it.data.forEach { jadwal ->
+                            list.addAll(jadwal.convertToList())
+                        }
+                    }
+                } catch (e: Exception) {
+                }
+
+
+
+            }, {
+
+            }))
+            list.filter { it.date == dates.joinToString("-") }
+//            appDatabase.prayerDao().deleteAll()
+//            appDatabase.prayerDao().insertAll(list)
+
+        } catch (e: Exception) {
+            null
+
+        }
     }
 
     fun getListSurah() : LiveData<ApiResponse<List<Surah>>> {

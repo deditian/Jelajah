@@ -37,15 +37,21 @@ import com.tian.jelajah.model.DataJadwal
 import com.tian.jelajah.model.JadwalSholatRequest
 import com.tian.jelajah.model.Menus
 import com.tian.jelajah.model.Prayer
+//import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.repositories.ApiResponse
+import com.tian.jelajah.repositories.CommonRepository
 import com.tian.jelajah.ui.quran.QuranActivity
 import com.tian.jelajah.utils.*
+import com.tian.jelajah.utils.Constants.BERITA
+import com.tian.jelajah.utils.Constants.DOA
+import com.tian.jelajah.utils.Constants.PAHLAWAN
+import com.tian.jelajah.utils.Constants.PESANTREN
+import com.tian.jelajah.utils.Constants.PUASA
+import com.tian.jelajah.utils.Constants.QURAN
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.util.*
 
 class MainMenuActivity : AppCompatActivity() {
@@ -72,6 +78,18 @@ class MainMenuActivity : AppCompatActivity() {
 
         setItemMenu()
 
+        binding.btnNotification.setOnClickListener {
+            val item = prayers?.find { prayer -> prayer.time.isValid() }
+            if (item != null) {
+                if (item.alarm) {
+//                    binding.btnNotification.setImageResource(if (item.type == "notify") R.drawable.ic_baseline_notifications_off_24 else R.drawable.ic_baseline_volume_off_24)
+
+                } else {
+//                    binding.btnNotification.setImageResource(if (item.type == "notify") R.drawable.ic_baseline_notifications_24 else R.drawable.ic_baseline_volume_up_24)
+                }
+//                ReminderReceiver.updateAlarm(this)
+            }
+        }
 
         viewModel.responseJadwalSholat.observe(this){
             when(it) {
@@ -102,6 +120,7 @@ class MainMenuActivity : AppCompatActivity() {
                 binding.txtTimePrayer.text = string
                 countDownTimer?.cancel()
                 countDownTimer = null
+
                 runCountDown(it.time)
                 return
             }
@@ -158,12 +177,12 @@ class MainMenuActivity : AppCompatActivity() {
 
     private fun setItemMenu() {
         val array = ArrayList<Menus>()
-        array.add(Menus(Color.WHITE, "Al-Quran"))
-        array.add(Menus(Color.WHITE, "Doa-doa"))
-        array.add(Menus(Color.WHITE, "Puasa Sunah"))
-        array.add(Menus(Color.WHITE, "Berita"))
-        array.add(Menus(Color.WHITE, "Pesantren di Indonesia"))
-        array.add(Menus(Color.WHITE, "Pahlawan Nasional Indonesia"))
+        array.add(Menus(Color.WHITE, QURAN))
+        array.add(Menus(Color.WHITE, DOA))
+        array.add(Menus(Color.WHITE, PUASA))
+        array.add(Menus(Color.WHITE, BERITA))
+        array.add(Menus(Color.WHITE, PESANTREN))
+        array.add(Menus(Color.WHITE, PAHLAWAN))
         adapter.submitList(array)
     }
 
@@ -172,22 +191,22 @@ class MainMenuActivity : AppCompatActivity() {
             override fun onItemClicked(view: View, item: Menus) {
 
                 when (item.name){
-                    Constants.QURAN ->{
+                    QURAN ->{
                         gotoActivity(QuranActivity::class)
                     }
-                    Constants.DOA ->{
+                    DOA ->{
 
                     }
-                    Constants.PUASA ->{
+                    PUASA ->{
 
                     }
-                    Constants.BERITA ->{
+                    BERITA ->{
 
                     }
-                    Constants.PESANTREN ->{
+                    PESANTREN ->{
 
                     }
-                    Constants.PAHLAWAN ->{
+                    PAHLAWAN ->{
 
                     }
                 }
@@ -224,13 +243,9 @@ class MainMenuActivity : AppCompatActivity() {
                         val lat = location.latitude
                         val longi = location.longitude
                         val latAndLong = "$lat|$longi"
-//                        val jadwalSholatRequest = JadwalSholatRequest(lat,longi, 2022,6,23)
                         viewModel._jadwalSholat(latAndLong)
-                        Log.e(TAG, "onCreate: $lat")
                         val addresses = geocoder.getFromLocation(lat, longi, 1)
-//                        val cityName = addresses[0].locality
                         val cityName = addresses[0].adminArea
-                        Log.e(TAG, "onLocationChanged: $cityName")
                         CoroutineScope(Dispatchers.Main).launch {
                             binding.txtCurrentLocation.let { btn ->
                                 btn.isEnabled = true
@@ -256,17 +271,14 @@ class MainMenuActivity : AppCompatActivity() {
                     ActivityCompat.
                     shouldShowRequestPermissionRationale(this, it)}
             ) {
-                val dialog = AlertDialog.Builder(this)
-                    .setTitle("Permission")
-                    .setMessage("Permission needed!")
-                    .setPositiveButton("OK") { _, _ ->
+                alert("Permission", "Permission needed!") {
+                    positiveButton("Ok") {
                         ActivityCompat.requestPermissions(
-                            this, perm, PERMISSION_ID
+                            this@MainMenuActivity, perm, PERMISSION_ID
                         )
                     }
-                    .setNegativeButton("No") { _, _ -> }
-                    .create()
-                dialog.show()
+                    negativeButton("Cancel"){}
+                }.show()
             } else {
                 ActivityCompat.requestPermissions(this, perm, PERMISSION_ID)
             }

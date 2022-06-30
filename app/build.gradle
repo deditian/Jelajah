@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -85,4 +86,21 @@ dependencies {
     // view binding helper
     implementation 'com.github.yogacp:android-viewbinding:1.0.3'
 
+    //dagger
+    implementation "com.google.dagger:dagger:2.35.1"
+    implementation "com.google.dagger:dagger-android:2.35.1"
+    kapt "com.google.dagger:dagger-compiler:2.28.1"
+    implementation "com.google.dagger:dagger-android-support:2.28.1"
+    kapt "com.google.dagger:dagger-android-processor:2.28.1"
+
+    //room
+    implementation "androidx.room:room-runtime:2.4.0-alpha02"
+    implementation 'androidx.preference:preference-ktx:1.1.1'
+    kapt "androidx.room:room-compiler:2.4.0-alpha02"
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:2.4.0-alpha02"
+
+    // optional - Test helpers
+    testImplementation "androidx.room:room-testing:2.4.0-alpha02"
 }

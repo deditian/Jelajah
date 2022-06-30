@@ -1,15 +1,13 @@
 package com.tian.jelajah.ui.quran
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.app.Application
+import androidx.lifecycle.*
 import com.tian.jelajah.repositories.CommonRepository
 import kotlinx.coroutines.launch
 
-class QuranViewModel : ViewModel() {
+class QuranViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = CommonRepository()
+    private val repository = CommonRepository(application)
 
     private var _surah = MutableLiveData<Unit>()
 

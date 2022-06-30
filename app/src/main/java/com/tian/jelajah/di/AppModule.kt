@@ -5,7 +5,7 @@ package com.tian.jelajah.di
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.tian.jelajah.BuildConfig
-import com.tian.jelajah.data.ApiServices
+import com.tian.jelajah.data.api.ApiServices
 import com.tian.jelajah.utils.Constants
 import com.tian.jelajah.utils.Pref
 import okhttp3.Interceptor

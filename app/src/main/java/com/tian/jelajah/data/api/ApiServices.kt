@@ -1,4 +1,4 @@
-package com.tian.jelajah.data
+package com.tian.jelajah.data.api
 
 import retrofit2.Call
 import retrofit2.http.GET

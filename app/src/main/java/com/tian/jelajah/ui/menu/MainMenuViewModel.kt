@@ -1,18 +1,16 @@
 package com.tian.jelajah.ui.menu
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.app.Application
+import androidx.lifecycle.*
 import com.tian.jelajah.model.JadwalSholatRequest
 import com.tian.jelajah.model.Prayer
 import com.tian.jelajah.repositories.CommonRepository
 import kotlinx.coroutines.launch
 import java.util.concurrent.CountDownLatch
 
-class MainMenuViewModel : ViewModel() {
+class MainMenuViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = CommonRepository()
+    private val repository = CommonRepository(application)
 
     private var _jadwalSholat = MutableLiveData<String>()
 

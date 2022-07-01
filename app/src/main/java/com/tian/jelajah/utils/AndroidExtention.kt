@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.tian.jelajah.R
 import com.tian.jelajah.model.DataJadwal
-import com.tian.jelajah.model.Jadwal
 import com.tian.jelajah.model.Prayer
 import java.lang.reflect.Modifier
 import java.text.ParseException
@@ -86,6 +85,14 @@ fun <K: Activity> Fragment.gotoActivity(klass: KClass<K>) {
 fun dateFormat(format: String? = null, time: Long? = null) : String {
     val current = SimpleDateFormat(format ?: "yyyy-MM-dd")
     return current.format(if (time != null) Date(time) else Date())
+}
+
+@SuppressLint("SimpleDateFormat")
+fun dateFormatParse(format: String?, time: String): String {
+    val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val formatter = SimpleDateFormat(format, Locale.getDefault())
+    val parse = parser.parse(time)
+    return formatter.format(parse!!)
 }
 
 

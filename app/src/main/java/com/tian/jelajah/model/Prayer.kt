@@ -1,21 +1,24 @@
 package com.tian.jelajah.model
 
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 
 
-//@Entity(tableName = "prayer")
+@Entity(tableName = "prayer")
 @Parcelize
 data class Prayer(
-//        @PrimaryKey(autoGenerate = true)
+        @PrimaryKey(autoGenerate = true)
         var id: Int = 0,
         val time: Long,
         val name: String,
         val backgroundColor: Int,
         val date: String,
         val type: String,
-//        @Ignore
+        @Ignore
         val alarm: Boolean = false,
 ) : Parcelable {
 

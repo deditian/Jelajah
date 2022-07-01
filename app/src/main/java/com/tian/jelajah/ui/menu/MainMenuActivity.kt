@@ -117,10 +117,12 @@ class MainMenuActivity : AppCompatActivity() {
         prayer.forEach {
             if (it.time.isValid()) {
                 val string = "${getStringWithNameId(it.name)} ${dateFormat("HH:mm", it.time)}"
-                binding.txtTimePrayer.text = string
+                CoroutineScope(Dispatchers.Main).launch {
+                    binding.txtTimePrayer.text = string
+                    binding.txtDate.text = dateFormatParse("EEEE, dd MMMM yyyy",it.date)
+                }
                 countDownTimer?.cancel()
                 countDownTimer = null
-
                 runCountDown(it.time)
                 return
             }

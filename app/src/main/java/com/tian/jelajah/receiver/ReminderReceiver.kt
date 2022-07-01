@@ -11,8 +11,10 @@
 //import androidx.core.app.NotificationManagerCompat
 //import androidx.localbroadcastmanager.content.LocalBroadcastManager
 //import com.tian.jelajah.R
+//import com.tian.jelajah.data.db.AppDatabase
 //import com.tian.jelajah.data.pref.Preference
 //import com.tian.jelajah.model.Prayer
+//import com.tian.jelajah.repositories.CommonRepository
 //import com.tian.jelajah.utils.PrayerUtils
 //import com.tian.jelajah.utils.dateFormat
 //import com.tian.jelajah.utils.nameResource
@@ -130,12 +132,12 @@
 //
 //    }
 //
-////    @Inject
-////    lateinit var db: AppDatabase
+//    @Inject
+//    lateinit var db: AppDatabase
 //    @Inject
 //    lateinit var preference: Preference
-////    @Inject
-////    lateinit var repository: Repository
+//    @Inject
+//    lateinit var repository: CommonRepository
 //
 //    override fun onReceive(context: Context, intent: Intent) {
 //        super.onReceive(context, intent)

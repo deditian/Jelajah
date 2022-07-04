@@ -4,8 +4,6 @@ import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
@@ -33,13 +31,9 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.tian.jelajah.R
 import com.tian.jelajah.databinding.ActivityMainMenuBinding
-import com.tian.jelajah.model.DataJadwal
-import com.tian.jelajah.model.JadwalSholatRequest
 import com.tian.jelajah.model.Menus
 import com.tian.jelajah.model.Prayer
-//import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.repositories.ApiResponse
-import com.tian.jelajah.repositories.CommonRepository
 import com.tian.jelajah.ui.quran.QuranActivity
 import com.tian.jelajah.utils.*
 import com.tian.jelajah.utils.Constants.BERITA
@@ -97,9 +91,10 @@ class MainMenuActivity : AppCompatActivity() {
                     Log.e(TAG, "onCreate error: ${it.error}" )
                 }
                 ApiResponse.Loading -> {
-
+                    showDialogProgress()
                 }
                 is ApiResponse.Success -> {
+                    hideDialogProgress()
                     prayers = it.data.run {
                         val prayers = ArrayList<Prayer>()
                         forEach { prayer ->  prayers.add(prayer) }
@@ -109,6 +104,14 @@ class MainMenuActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    fun showDialogProgress(){
+        binding.pbMenu.spinKit.visibility = View.VISIBLE
+    }
+
+    fun hideDialogProgress (){
+        binding.pbMenu.spinKit.visibility = View.GONE
     }
 
 

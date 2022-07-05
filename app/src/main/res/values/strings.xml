@@ -20,4 +20,9 @@
     <string name="asr">Ashar</string>
     <string name="maghrib">Maghrib</string>
     <string name="isha">Isha</string>
+
+    <string name="notification_body_adzan">Sekarang waktunya salat %s.</string>
+    <string name="notification_body">Sekarang waktunya %s.</string>
+    <string name="alarm_timed_before_adzan">%s menit lagi saatnya salat %s</string>
+    <string name="alarm_timed_before">%s menit lagi saatnya %s</string>
 </resources>

@@ -19,4 +19,16 @@ class PrayerUtils(private val preference: Preference) {
             prayer.copy(time = prayer.time + (time * 60000))
         } else prayer
     }
+
+    fun correctionTimingPrayers(list: List<Prayer>) : List<Prayer> {
+        val prayers = ArrayList<Prayer>(list)
+        val correction = preference.alarmCorrectionTime
+        list.filter { it.name != "sunrise" && it.name != "dhuha" && it.name != "imsak" }.forEachIndexed { i, v ->
+            val time = correction[i].toInt()
+            val index = prayers.indexOf(v)
+            prayers.remove(v)
+            prayers.add(index, v.copy(time = v.time + (time * 60000)))
+        }
+        return prayers
+    }
 }

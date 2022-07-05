@@ -23,16 +23,16 @@ import androidx.core.animation.doOnEnd
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import com.github.razir.progressbutton.DrawableButton
 import com.github.razir.progressbutton.hideProgress
-import com.github.razir.progressbutton.showProgress
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.tian.jelajah.R
+import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.databinding.ActivityMainMenuBinding
 import com.tian.jelajah.model.Menus
 import com.tian.jelajah.model.Prayer
+import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.repositories.ApiResponse
 import com.tian.jelajah.ui.quran.QuranActivity
 import com.tian.jelajah.utils.*
@@ -47,6 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
+import javax.inject.Inject
 
 class MainMenuActivity : AppCompatActivity() {
     lateinit var binding : ActivityMainMenuBinding
@@ -57,11 +58,15 @@ class MainMenuActivity : AppCompatActivity() {
     private val TAG = this::class.java.simpleName
     private var countDownTimer: CountDownTimer? = null
     private var prayers: List<Prayer>? = null
+    lateinit var preference: Preference
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        preference = Preference(this)
+        preference.isInitialize = true
+        preference.notifications = arrayListOf("imsak","fajr","sunrise","dhuha","dhuhr","asr","maghrib","isha")
+        ReminderReceiver.enableReminder(this)
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
@@ -75,19 +80,43 @@ class MainMenuActivity : AppCompatActivity() {
         binding.btnNotification.setOnClickListener {
             val item = prayers?.find { prayer -> prayer.time.isValid() }
             if (item != null) {
-                if (item.alarm) {
-//                    binding.btnNotification.setImageResource(if (item.type == "notify") R.drawable.ic_baseline_notifications_off_24 else R.drawable.ic_baseline_volume_off_24)
-
-                } else {
-//                    binding.btnNotification.setImageResource(if (item.type == "notify") R.drawable.ic_baseline_notifications_24 else R.drawable.ic_baseline_volume_up_24)
+                preference.notifications.let { list ->
+                    preference.notifications = if (item.alarm)  list.filter { f -> f != item.name }
+                    else ArrayList(list).apply { add(item.name) }
                 }
-//                ReminderReceiver.updateAlarm(this)
+                if (item.alarm) {
+                    binding.btnNotification.setImageResource(if (item.type == "notify")
+                        R.drawable.ic_notifications_off else R.drawable.ic_baseline_volume_off_24)
+                    ReminderReceiver.updateAlarm(this)
+                } else {
+                    binding.btnNotification.setImageResource(if (item.type == "notify")
+                        R.drawable.ic_notifications else R.drawable.ic_baseline_volume_up_24)
+                    ReminderReceiver.updateAlarm(this)
+                }
+                viewModel.prayers()
+            }
+        }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        synchronized(preference){}
+        viewModel.prayers()
+        viewModel.responsePrayers.observe(this) {
+            it?.let { list ->
+                prayers = list.run {
+                    val prayers = ArrayList<Prayer>()
+                    forEach { prayer ->  prayers.add(prayer.copy(alarm = preference.notifications.find { notify -> notify == prayer.name } != null)) }
+                    return@run prayers
+                }
+                updatePrayer(prayers!!)
             }
         }
 
         viewModel.responseJadwalSholat.observe(this){
             when(it) {
                 is ApiResponse.Error -> {
+                    hideDialogProgress()
                     Log.e(TAG, "onCreate error: ${it.error}" )
                 }
                 ApiResponse.Loading -> {
@@ -119,6 +148,7 @@ class MainMenuActivity : AppCompatActivity() {
     private fun updatePrayer(prayer : List<Prayer>) {
         prayer.forEach {
             if (it.time.isValid()) {
+                Log.e(TAG, "updatePrayer: $it" )
                 val string = "${getStringWithNameId(it.name)} ${dateFormat("HH:mm", it.time)}"
                 CoroutineScope(Dispatchers.Main).launch {
                     binding.txtTimePrayer.text = string
@@ -142,7 +172,7 @@ class MainMenuActivity : AppCompatActivity() {
 
         if (countDownTimer != null) return
 
-        countDownTimer = object : CountDownTimer(countTimeLong, 1000L) {
+        countDownTimer = object : CountDownTimer(3000, 1000L) {
             override fun onTick(elapsedTime: Long) {
                 binding.txtCountdownPrayer.text = createTimeString(elapsedTime)
             }
@@ -222,23 +252,9 @@ class MainMenuActivity : AppCompatActivity() {
 
     private fun findLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@MainMenuActivity)
-        if (checkPermission(
-                ACCESS_COARSE_LOCATION,
-                ACCESS_FINE_LOCATION)) {
-            fusedLocationClient.lastLocation.
-            addOnSuccessListener(this
-            ) { location: Location? ->
-                // Got last known location. In some rare
-                // situations this can be null.
-                binding.txtCurrentLocation.showProgress {
-                    this.progressColor = Color.WHITE
-                    gravity = DrawableButton.GRAVITY_CENTER
-                }
+        if (checkPermission(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION)) {
+            fusedLocationClient.lastLocation.addOnSuccessListener(this) { location: Location? ->
                 if (location == null) {
-                    binding.txtCurrentLocation.let { btn ->
-                        btn.isEnabled = true
-                        btn.hideProgress(getString(R.string.find_location))
-                    }
                     startLocationRequests()
                 } else location.apply {
                     // Handle location object
@@ -252,14 +268,11 @@ class MainMenuActivity : AppCompatActivity() {
                         val addresses = geocoder.getFromLocation(lat, longi, 1)
                         val cityName = addresses[0].adminArea
                         CoroutineScope(Dispatchers.Main).launch {
-                            binding.txtCurrentLocation.let { btn ->
-                                btn.isEnabled = true
-                                btn.hideProgress(getString(R.string.find_location))
-                            }
-                            binding.txtCurrentLocation.text = cityName
+                            binding .txtCurrentLocation.hideProgress(cityName)
                         }
                     } catch (e: IOException) {
                         e.printStackTrace()
+                        binding .txtCurrentLocation.hideProgress(e.localizedMessage)
                     }
                 }
             }
@@ -318,12 +331,7 @@ class MainMenuActivity : AppCompatActivity() {
 
         task.addOnFailureListener { exception ->
             if (exception is ResolvableApiException){
-                // Location settings are not satisfied, but this can be fixed
-                // by showing the user a dialog.
                 try {
-                    // Show the dialog by calling startResolutionForResult(),
-                    // and check the result in onActivityResult().
-                    // IF STATEMENT THAT PREVENTS THE DIALOG FROM PROMPTING.
                     if (checkLocationPermission()) {
                         exception.startResolutionForResult(
                             this,
@@ -362,9 +370,7 @@ class MainMenuActivity : AppCompatActivity() {
 
     private val locationUpdates = object : LocationCallback() {
         override fun onLocationResult(lr: LocationResult) {
-            Log.e("LOG", lr.toString())
-            Log.e("LOG", "Newest Location: " + lr.locations.last())
-            // do something with the new location...
+            findLocation()
         }
     }
 

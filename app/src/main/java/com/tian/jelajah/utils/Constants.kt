@@ -11,4 +11,5 @@ object Constants {
     const val BERITA = "Berita"
     const val PESANTREN = "Pesantren di Indonesia"
     const val PAHLAWAN = "Pahlawan Nasional Indonesia"
+    const val EXTRA_PRAYER_NOW = "extra_prayer_now"
 }

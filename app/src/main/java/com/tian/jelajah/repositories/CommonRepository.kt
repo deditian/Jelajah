@@ -4,22 +4,29 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.tian.jelajah.data.db.AppDatabase
 import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.di.AppModule
 import com.tian.jelajah.model.*
+import com.tian.jelajah.utils.PrayerUtils
 import com.tian.jelajah.utils.convertToList
 import com.tian.jelajah.utils.dateFormat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import retrofit2.*
 import java.util.*
 import kotlin.reflect.KClass
 
-
-class CommonRepository (application: Application) {
+class CommonRepository(application: Application) {
 
     private val apiService = AppModule.getInstance()
     private var preference = Preference(application)
+    private val appDatabase = AppDatabase.newInstance(application)
 
 
     fun getJadwalSholat(latAndLong : String) : LiveData<ApiResponse<List<Prayer>>> {
@@ -31,10 +38,11 @@ class CommonRepository (application: Application) {
         val latlong = latAndLong.split("|")
         val lat = latlong[0].toDouble()
         val longi = latlong[1].toDouble()
-
-        apiService.provideApiJadwalService().getJadwalSholat(lat, longi,
+        apiService.provideApiJadwalService().getJadwalSholat(
+            lat, longi,
             dates[0].toInt(), dates[1].toInt(),
-            dates[2].toInt()).enqueue(enqueue(JadwalSholatResponse::class, { it ->
+            dates[2].toInt()
+        ).enqueue(enqueue(JadwalSholatResponse::class, { it ->
             try {
                 val list = ArrayList<Prayer>()
                 it.let {
@@ -42,10 +50,15 @@ class CommonRepository (application: Application) {
                         list.addAll(jadwal.convertToList())
                     }
                 }
+                CoroutineScope(Dispatchers.IO).launch {
+                    appDatabase.prayerDao().deleteAll()
+                    appDatabase.prayerDao().insertAll(list)
+                }
                 val prayers = list.filter { it.date == dates.joinToString("-") }
-                Log.e("TAG", "getJadwal: ${prayers}" )
+                Log.e("TAG", "getJadwal: ${prayers}")
                 result.value = ApiResponse.Success(prayers)
             } catch (e: Exception) {
+                e.printStackTrace()
                 result.value = ApiResponse.Error(it)
             }
 
@@ -57,7 +70,32 @@ class CommonRepository (application: Application) {
         return result
     }
 
-    fun loadApiPrayer(date: String) : List<Prayer>? {
+    fun prayer(date: String) : LiveData<List<Prayer>> {
+        val results = MediatorLiveData<List<Prayer>>()
+        CoroutineScope(Dispatchers.IO).launch {
+            val list = prayerListFromDay(if(date.isEmpty()) dateFormat("yyyy-MM-dd") else date)
+            CoroutineScope(Dispatchers.Main).launch {
+                results.postValue(list)
+            }
+        }
+        return results
+    }
+
+    private suspend fun prayerListFromDay(date: String) : List<Prayer> {
+        val list = appDatabase.prayerDao().get(dateFormat(date))
+        return if (list.isEmpty()) {
+            val nextDay = dateFormat("yyyy-MM-dd", Date().time + 1000 * 60 * 60 * 24).split("-")
+            val nowDay = date.split("-")
+            val prayers = loadApiPrayer(when {
+                nextDay[0] > nowDay[0] -> nextDay.joinToString("-")
+                nextDay[1] > nowDay[1] -> nextDay.joinToString("-")
+                else -> date
+            } )
+            PrayerUtils(preference).correctionTimingPrayers(prayers?: Collections.emptyList())
+        } else PrayerUtils(preference).correctionTimingPrayers(list)
+    }
+
+    suspend fun loadApiPrayer(date: String) : List<Prayer>? {
         val dates = date.split("-")
         return try {
             val location = preference.locationLatLongi
@@ -68,7 +106,6 @@ class CommonRepository (application: Application) {
             apiService.provideApiJadwalService().getJadwalSholat(lat, longi,
                 dates[0].toInt(), dates[1].toInt(),
                 dates[2].toInt()).enqueue(enqueue(JadwalSholatResponse::class, { it ->
-
                 try {
                     it.let {
                         it.data.forEach { jadwal ->
@@ -77,19 +114,18 @@ class CommonRepository (application: Application) {
                     }
                 } catch (e: Exception) {
                 }
-
-
-
             }, {
 
             }))
+            Log.e("TAG", "loadApiPrayer: $list" )
+            CoroutineScope(Dispatchers.IO).launch {
+                appDatabase.prayerDao().deleteAll()
+                appDatabase.prayerDao().insertAll(list)
+            }
             list.filter { it.date == dates.joinToString("-") }
-//            appDatabase.prayerDao().deleteAll()
-//            appDatabase.prayerDao().insertAll(list)
-
         } catch (e: Exception) {
+            e.printStackTrace()
             null
-
         }
     }
 

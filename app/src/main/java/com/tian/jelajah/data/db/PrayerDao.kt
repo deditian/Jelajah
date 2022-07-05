@@ -18,16 +18,16 @@ interface PrayerDao {
     fun getLiveData(date: String): LiveData<List<Prayer>>
 
     @Query("SELECT * FROM prayer WHERE date=:date")
-    fun get(date: String): List<Prayer>
+    suspend fun get(date: String): List<Prayer>
 
     @Query("SELECT * FROM prayer WHERE id=:id")
-    fun get(id: Int): Prayer?
+    suspend fun get(id: Int): Prayer?
 
     @Query("SELECT * FROM prayer WHERE time=:time")
-    fun get(time: Long): Prayer?
+    suspend fun get(time: Long): Prayer?
 
     @Query("SELECT * FROM prayer WHERE time > :time ORDER BY time LIMIT 1")
-    fun getNext(time: Long): Prayer?
+    suspend fun getNext(time: Long): Prayer?
 
     @Query("SELECT * FROM prayer WHERE date=:date")
     fun getNext(date: String): List<Prayer>
@@ -36,6 +36,6 @@ interface PrayerDao {
     fun insertAll(list: List<Prayer>)
 
     @Query("DELETE FROM prayer")
-    fun deleteAll()
+    suspend fun deleteAll()
 
 }

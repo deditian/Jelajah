@@ -19,4 +19,12 @@ class MainMenuViewModel(application: Application) : AndroidViewModel(application
     fun _jadwalSholat(latAndLong : String) = viewModelScope.launch {
         _jadwalSholat.value = latAndLong
     }
+
+
+    private val prayers = MutableLiveData<String>()
+    val responsePrayers: LiveData<List<Prayer>> = Transformations.switchMap(prayers) { repository.prayer(it) }
+
+    fun prayers(nextDate: String = "")  = viewModelScope.launch {
+        prayers.postValue(nextDate)
+    }
 }

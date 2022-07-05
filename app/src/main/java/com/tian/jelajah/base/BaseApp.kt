@@ -1,8 +1,12 @@
 package com.tian.jelajah.base
 
+
 import android.app.Application
 import com.tian.jelajah.BuildConfig
 import com.tian.jelajah.utils.Pref
+import dagger.android.AndroidInjection.inject
+import dagger.android.AndroidInjector
+import dagger.android.DaggerApplication
 
 
 abstract class BaseApp : Application() {
@@ -11,6 +15,10 @@ abstract class BaseApp : Application() {
         super.onCreate()
         setupDefaultEnvironment()
     }
+
+//    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+//        return DaggerAppComponent.builder().application(this).build().apply { inject(this@BaseApp) }
+//    }
 
     open fun setupDefaultEnvironment() {
         Pref.init(this.applicationContext)

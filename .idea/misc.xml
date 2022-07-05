@@ -6,9 +6,12 @@
         <entry key="..\:/Android/Jelajah/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.153" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/drawable/background_round_white.xml" value="0.153" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1475" />
+        <entry key="..\:/Android/Jelajah/app/src/main/res/drawable/ic_notifications.xml" value="0.135" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/drawable/rounded.xml" value="0.153" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/layout/activity_main_menu.xml" value="0.25" />
+        <entry key="..\:/Android/Jelajah/app/src/main/res/layout/activity_prayer_time.xml" value="0.10885416666666667" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/layout/activity_quran.xml" value="0.16983695652173914" />
+        <entry key="..\:/Android/Jelajah/app/src/main/res/layout/activity_ring_adzan.xml" value="0.25" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/layout/dialog_info.xml" value="0.33" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/layout/fragment_main_menu.xml" value="0.16983695652173914" />
         <entry key="..\:/Android/Jelajah/app/src/main/res/layout/fragment_quran.xml" value="0.11775362318840579" />

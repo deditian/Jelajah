@@ -3,12 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tian.jelajah">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -23,6 +22,18 @@
         android:usesCleartextTraffic="true"
         tools:ignore="Instantiatable">
         <activity
+            android:name=".ui.splash.InitialActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.splash.SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".ui.player.PrayerTimeActivity"
             android:exported="false" />
         <activity
@@ -34,13 +45,7 @@
             android:theme="@style/Theme.Jelajah" />
         <activity
             android:name=".ui.menu.MainMenuActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
 
         <receiver
             android:name=".receiver.ReminderReceiver"

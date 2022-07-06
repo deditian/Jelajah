@@ -104,4 +104,9 @@ dependencies {
     testImplementation "androidx.room:room-testing:2.5.0-alpha02"
 
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+
+    // view binding helper
+    implementation 'com.github.yogacp:android-viewbinding:1.0.3'
+
+    implementation 'com.karumi:dexter:6.2.0'
 }

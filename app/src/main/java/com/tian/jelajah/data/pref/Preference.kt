@@ -25,6 +25,14 @@ class Preference constructor(context: Context) {
             editor.apply()
         }
 
+    var isUpdateLocation: Boolean
+        get() = prefs.getBoolean("initialize", false)
+        set(value) {
+            val editor = savePref()
+            editor.putBoolean("initialize", value)
+            editor.apply()
+        }
+
     var locationLatLongi: String?
         get() = prefs.getString("location_id", "")
         set(value) {

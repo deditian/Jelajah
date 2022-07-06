@@ -16,6 +16,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.viewbinding.library.activity.viewBinding
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -50,34 +51,34 @@ import java.util.*
 import javax.inject.Inject
 
 class MainMenuActivity : AppCompatActivity() {
-    lateinit var binding : ActivityMainMenuBinding
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val REQUEST_LOCATION_PERMISSION = 10100
-    private val PERMISSION_ID = 42
+    private val binding : ActivityMainMenuBinding by viewBinding()
     private val viewModel: MainMenuViewModel by viewModels()
     private val TAG = this::class.java.simpleName
     private var countDownTimer: CountDownTimer? = null
     private var prayers: List<Prayer>? = null
-    lateinit var preference: Preference
+    private val preference: Preference by lazy { Preference(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        preference = Preference(this)
-        preference.isInitialize = true
-        preference.notifications = arrayListOf("imsak","fajr","sunrise","dhuha","dhuhr","asr","maghrib","isha")
-        ReminderReceiver.enableReminder(this)
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+
+        window.statusBarColor = ContextCompat.getColor(this, R.color.my_color)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
-        binding.rvMenus.apply {
+        onView()
+        setItemMenu()
+
+        viewModel._jadwalSholat(preference.locationLatLongi!!)
+    }
+
+    private fun onView() = binding.run {
+        txtCurrentLocation.text = preference.city
+
+        rvMenus.apply {
             layoutManager = GridLayoutManager(context, 2)
             adapter = this@MainMenuActivity.adapter
         }
 
-        setItemMenu()
-
-        binding.btnNotification.setOnClickListener {
+        btnNotification.setOnClickListener {
             val item = prayers?.find { prayer -> prayer.time.isValid() }
             if (item != null) {
                 preference.notifications.let { list ->
@@ -87,20 +88,24 @@ class MainMenuActivity : AppCompatActivity() {
                 if (item.alarm) {
                     binding.btnNotification.setImageResource(if (item.type == "notify")
                         R.drawable.ic_notifications_off else R.drawable.ic_baseline_volume_off_24)
-                    ReminderReceiver.updateAlarm(this)
                 } else {
                     binding.btnNotification.setImageResource(if (item.type == "notify")
                         R.drawable.ic_notifications else R.drawable.ic_baseline_volume_up_24)
-                    ReminderReceiver.updateAlarm(this)
                 }
+                ReminderReceiver.updateAlarm(this@MainMenuActivity)
                 viewModel.prayers()
             }
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.prayers()
+    }
+
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        synchronized(preference){}
+
         viewModel.prayers()
         viewModel.responsePrayers.observe(this) {
             it?.let { list ->
@@ -160,6 +165,12 @@ class MainMenuActivity : AppCompatActivity() {
                 return
             }
         }
+
+        Calendar.getInstance().apply {
+            time = Date()
+            add(Calendar.DAY_OF_MONTH, 1)
+            viewModel.prayers(dateFormat(time =  time.time))
+        }
     }
 
     private fun runCountDown(time: Long?) {
@@ -172,7 +183,7 @@ class MainMenuActivity : AppCompatActivity() {
 
         if (countDownTimer != null) return
 
-        countDownTimer = object : CountDownTimer(3000, 1000L) {
+        countDownTimer = object : CountDownTimer(countTimeLong, 1000L) {
             override fun onTick(elapsedTime: Long) {
                 binding.txtCountdownPrayer.text = createTimeString(elapsedTime)
             }
@@ -202,12 +213,6 @@ class MainMenuActivity : AppCompatActivity() {
             }
             start()
         }
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        findLocation()
     }
 
     private fun setItemMenu() {
@@ -249,138 +254,8 @@ class MainMenuActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun findLocation() {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@MainMenuActivity)
-        if (checkPermission(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION)) {
-            fusedLocationClient.lastLocation.addOnSuccessListener(this) { location: Location? ->
-                if (location == null) {
-                    startLocationRequests()
-                } else location.apply {
-                    // Handle location object
-                    Log.e("LOG", location.toString())
-                    val geocoder = Geocoder(this@MainMenuActivity, Locale.getDefault())
-                    try {
-                        val lat = location.latitude
-                        val longi = location.longitude
-                        val latAndLong = "$lat|$longi"
-                        viewModel._jadwalSholat(latAndLong)
-                        val addresses = geocoder.getFromLocation(lat, longi, 1)
-                        val cityName = addresses[0].adminArea
-                        CoroutineScope(Dispatchers.Main).launch {
-                            binding .txtCurrentLocation.hideProgress(cityName)
-                        }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                        binding .txtCurrentLocation.hideProgress(e.localizedMessage)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun checkPermission(vararg perm:String) : Boolean {
-        val havePermissions = perm.toList().all {
-            ContextCompat.checkSelfPermission(this,it) ==
-                    PackageManager.PERMISSION_GRANTED
-        }
-        if (!havePermissions) {
-            if(perm.toList().any {
-                    ActivityCompat.
-                    shouldShowRequestPermissionRationale(this, it)}
-            ) {
-                alert("Permission", "Permission needed!") {
-                    positiveButton("Ok") {
-                        ActivityCompat.requestPermissions(
-                            this@MainMenuActivity, perm, PERMISSION_ID
-                        )
-                    }
-                    negativeButton("Cancel"){}
-                }.show()
-            } else {
-                ActivityCompat.requestPermissions(this, perm, PERMISSION_ID)
-            }
-            return false
-        }
-        return true
-    }
-
-    private fun startLocationRequests() {
-        val locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
-
-        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-        val client: SettingsClient = LocationServices.getSettingsClient(this)
-        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
-
-        task.addOnSuccessListener { locationSettingsResponse ->
-            val states = locationSettingsResponse.locationSettingsStates
-            if (states!!.isLocationPresent) {
-                //Do something
-                findLocation()
-            }
-           
-            if (checkLocationPermission()) {
-                fusedLocationClient.requestLocationUpdates(
-                    locationRequest, locationUpdates, Looper.getMainLooper())
-            }
-        }
-
-        task.addOnFailureListener { exception ->
-            if (exception is ResolvableApiException){
-                try {
-                    if (checkLocationPermission()) {
-                        exception.startResolutionForResult(
-                            this,
-                            REQUEST_LOCATION_PERMISSION
-                        )
-                    }
-                } catch (sendEx: IntentSender.SendIntentException) {
-                    // Ignore the error.
-                }
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            REQUEST_LOCATION_PERMISSION -> when (resultCode) {
-                RESULT_OK -> {
-                    findLocation()
-                    Toast.makeText(this, "Location enabled by user", Toast.LENGTH_LONG)
-                        .show()
-                }
-                RESULT_CANCELED -> {
-                    finish()
-                    Toast.makeText(this, "Location not enabled, user cancelled.", Toast.LENGTH_LONG).show()
-                }
-                else -> {
-                }
-            }
-        }
-    }
-
-    private fun checkLocationPermission() : Boolean = (ContextCompat.checkSelfPermission(
-        this, ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-
-
-    private val locationUpdates = object : LocationCallback() {
-        override fun onLocationResult(lr: LocationResult) {
-            findLocation()
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        stopPeriodic()
         countDownTimer?.cancel()
-    }
-
-    private fun stopPeriodic() {
-        fusedLocationClient.removeLocationUpdates(locationUpdates)
     }
 }

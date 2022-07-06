@@ -11,6 +11,9 @@
     <string name="surah">Surah</string>
     <string name="favorite_surah">Surah Favorite</string>
 
+    <string name="init_permission_locate">Aplikasi membutuhkan lokasi Anda untuk menghitung waktu sholat yang akurat</string>
+    <string name="locate_me">Temukan aku</string>
+
     <string name="adzan">Adhan</string>
     <string name="imsak">Imsak</string>
     <string name="fajr">Fajr</string>
@@ -25,4 +28,10 @@
     <string name="notification_body">Sekarang waktunya %s.</string>
     <string name="alarm_timed_before_adzan">%s menit lagi saatnya salat %s</string>
     <string name="alarm_timed_before">%s menit lagi saatnya %s</string>
+
+    <string name="alarm_shalat_now">Ingatkan waktu salat</string>
+    <string name="alarm_before_time_salat">Ingatkan %s menit sebelum salat</string>
+
+    <string name="error_permission_location">This application is not given permission to access your location.</string>
+
 </resources>

@@ -52,11 +52,8 @@ class ReminderReceiver : BroadcastReceiver() {
             val alarmTime = preference.alarmTimeOut * 60000
 
             CoroutineScope(Dispatchers.IO).launch {
-                Log.e("TAG", "enableReminder: aaaaaaa | $alarmTime" )
                 getNextPrayer(db, preference, timeBefore)?.let { prayer ->
-                    Log.e("TAG", "enableReminder: ddddddddd | $alarmTime" )
                     prayerUtil.correctionTimingPrayer(prayer).let {
-                        Log.e("TAG", "enableReminder: ${it.time} | $alarmTime" )
                         if (alarmTime > 0 && (it.time - alarmTime) > now && (it.name != "sunrise" && it.name != "dhuha" && it.name != "imsak"))
                             enableReminder(context, it.id, it.time - alarmTime)
                         else
@@ -113,7 +110,7 @@ class ReminderReceiver : BroadcastReceiver() {
             )
         }
 
-        private fun isReminder(context: Context) : Boolean {
+        fun isReminder(context: Context) : Boolean {
             return PendingIntent.getBroadcast(context, ALARM_ID,
                 Intent(context, ReminderReceiver::class.java),
                 PendingIntent.FLAG_CANCEL_CURRENT
@@ -147,15 +144,13 @@ class ReminderReceiver : BroadcastReceiver() {
 
     }
 
-    @Inject
+
     lateinit var db: AppDatabase
-    @Inject
     lateinit var preference: Preference
-    @Inject
     lateinit var repository: CommonRepository
 
-
     override fun onReceive(context: Context, intent: Intent) {
+        repository = CommonRepository(context.applicationContext as Application)
         db = AppDatabase.newInstance(context)
         preference = Preference(context)
         val prayerUtil = PrayerUtils(preference)

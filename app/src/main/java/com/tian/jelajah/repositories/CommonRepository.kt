@@ -27,7 +27,7 @@ class CommonRepository(application: Application) {
     private val apiService = AppModule.getInstance()
     private var preference = Preference(application)
     private val appDatabase = AppDatabase.newInstance(application)
-
+    private val TAG = this::class.java.simpleName
 
     fun getJadwalSholat(latAndLong : String) : LiveData<ApiResponse<List<Prayer>>> {
         val result = MutableLiveData<ApiResponse<List<Prayer>>>()
@@ -55,7 +55,7 @@ class CommonRepository(application: Application) {
                     appDatabase.prayerDao().insertAll(list)
                 }
                 val prayers = list.filter { it.date == dates.joinToString("-") }
-                Log.e("TAG", "getJadwal: ${prayers}")
+                Log.e(TAG, "getJadwal: ${prayers}")
                 result.value = ApiResponse.Success(prayers)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -71,10 +71,12 @@ class CommonRepository(application: Application) {
     }
 
     fun prayer(date: String) : LiveData<List<Prayer>> {
+        Log.e(TAG, "prayer: ATAS $date", )
         val results = MediatorLiveData<List<Prayer>>()
         CoroutineScope(Dispatchers.IO).launch {
             val list = prayerListFromDay(if(date.isEmpty()) dateFormat("yyyy-MM-dd") else date)
             CoroutineScope(Dispatchers.Main).launch {
+                Log.e(TAG, "prayer: $list", )
                 results.postValue(list)
             }
         }
@@ -83,6 +85,7 @@ class CommonRepository(application: Application) {
 
     private suspend fun prayerListFromDay(date: String) : List<Prayer> {
         val list = appDatabase.prayerDao().get(dateFormat(date))
+        Log.e(TAG, "prayerListFromDay:list.isEmpty==${list.isEmpty()}", )
         return if (list.isEmpty()) {
             val nextDay = dateFormat("yyyy-MM-dd", Date().time + 1000 * 60 * 60 * 24).split("-")
             val nowDay = date.split("-")
@@ -91,38 +94,44 @@ class CommonRepository(application: Application) {
                 nextDay[1] > nowDay[1] -> nextDay.joinToString("-")
                 else -> date
             } )
+            Log.e(TAG, "prayerListFromDay: $list | $prayers", )
             PrayerUtils(preference).correctionTimingPrayers(prayers?: Collections.emptyList())
         } else PrayerUtils(preference).correctionTimingPrayers(list)
     }
 
     suspend fun loadApiPrayer(date: String) : List<Prayer>? {
+        Log.e(TAG, "loadApiPrayer  ATAS: $date", )
         val dates = date.split("-")
         return try {
-            val location = preference.locationLatLongi
-            val latlong = location?.split("|")
-            val lat = latlong!![0].toDouble()
-            val longi = latlong[1].toDouble()
             val list = ArrayList<Prayer>()
-            apiService.provideApiJadwalService().getJadwalSholat(lat, longi,
-                dates[0].toInt(), dates[1].toInt(),
-                dates[2].toInt()).enqueue(enqueue(JadwalSholatResponse::class, { it ->
-                try {
-                    it.let {
-                        it.data.forEach { jadwal ->
-                            list.addAll(jadwal.convertToList())
+            val location = preference.locationLatLongi
+            if(location != null){
+                val latlong = location.split("|")
+                val lat = latlong[0].toDouble()
+                val longi = latlong[1].toDouble()
+                Log.e(TAG, "loadApiPrayer: $latlong", )
+                apiService.provideApiJadwalService().getJadwalSholat(lat, longi,
+                    dates[0].toInt(), dates[1].toInt(),
+                    dates[2].toInt()).enqueue(enqueue(JadwalSholatResponse::class, { it ->
+                    try {
+                        it.let {
+                            it.data.forEach { jadwal ->
+                                Log.e(TAG, "loadApiPrayer JADWAL: ${jadwal}", )
+                                list.addAll(jadwal.convertToList())
+                            }
                         }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            Log.e(TAG, "loadApiPrayer: BAWAH $list" )
+                            appDatabase.prayerDao().deleteAll()
+                            appDatabase.prayerDao().insertAll(list)
+                        }
+                    } catch (e: Exception) {
                     }
-                } catch (e: Exception) {
-                }
-            }, {
-
-            }))
-            Log.e("TAG", "loadApiPrayer: $list" )
-            CoroutineScope(Dispatchers.IO).launch {
-                appDatabase.prayerDao().deleteAll()
-                appDatabase.prayerDao().insertAll(list)
-            }
-            list.filter { it.date == dates.joinToString("-") }
+                }, {
+                    Log.e(TAG, "loadApiPrayer: error:: $it", )
+                }))
+                list.filter { it.date == dates.joinToString("-") }
+            }else null
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -135,7 +144,7 @@ class CommonRepository(application: Application) {
         result.value = ApiResponse.Loading
 
         apiService.provideApiQuranService().getListSurah().enqueue(enqueue(SurahListResponse::class, {
-            Log.e("TAG", "getListSurah: $it" )
+            Log.e(TAG, "getListSurah: $it" )
             result.value = ApiResponse.Success(it.data)
         }, {
             result.value = ApiResponse.Error(it)

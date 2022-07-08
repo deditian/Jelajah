@@ -1,8 +1,6 @@
 package com.tian.jelajah.utils
 
-/**
- * Created by User on 08/05/2018.
- */
+
 object Constants {
     const val LANGUAGE = "language"
     const val QURAN = "Al-Quran"
@@ -12,4 +10,5 @@ object Constants {
     const val PESANTREN = "Pesantren di Indonesia"
     const val PAHLAWAN = "Pahlawan Nasional Indonesia"
     const val EXTRA_PRAYER_NOW = "extra_prayer_now"
+    const val LOCATION_WORKER = "location_worker"
 }

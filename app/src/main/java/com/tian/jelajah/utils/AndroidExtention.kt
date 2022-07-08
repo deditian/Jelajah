@@ -2,15 +2,20 @@ package com.tian.jelajah.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Parcelable
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import com.google.common.util.concurrent.ListenableFuture
 import com.tian.jelajah.R
 import com.tian.jelajah.model.DataJadwal
 import com.tian.jelajah.model.Prayer
@@ -18,6 +23,7 @@ import java.lang.reflect.Modifier
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.ExecutionException
 import kotlin.reflect.KClass
 
 fun Activity.checkAndRequestPermission(
@@ -179,4 +185,42 @@ fun String.nameResource(clazz: Class<*>) : Int  {
         }
     }
     return value
+}
+
+fun Context.isServiceRunning(serviceClass: Class<*>): Boolean {
+    val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+    if (manager != null) {
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                logi("servis run")
+                return true
+            }
+        }
+    }
+    logi("servis gak trun")
+    return false
+}
+
+fun logi(msg: String) = Log.i("JELAJAH_LOG", msg)
+fun loge(msg: String) = Log.e("JELAJAH_LOG ERROR", msg)
+
+fun isWorkScheduled(context: Context, tag: String): Boolean {
+    val instance = WorkManager.getInstance(context)
+    val statuses: ListenableFuture<List<WorkInfo>> = instance.getWorkInfosByTag(tag)
+    return try {
+        var running = false
+        val workInfoList: List<WorkInfo> = statuses.get()
+        for (workInfo in workInfoList) {
+            val state = workInfo.state
+            running = state == WorkInfo.State.RUNNING || state == WorkInfo.State.ENQUEUED
+        }
+        logi("service is run = $running")
+        running
+    } catch (e: ExecutionException) {
+        e.printStackTrace()
+        false
+    } catch (e: InterruptedException) {
+        e.printStackTrace()
+        false
+    }
 }

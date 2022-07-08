@@ -35,6 +35,7 @@ import com.tian.jelajah.model.Menus
 import com.tian.jelajah.model.Prayer
 import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.repositories.ApiResponse
+import com.tian.jelajah.services.ServiceHelper
 import com.tian.jelajah.ui.quran.QuranActivity
 import com.tian.jelajah.utils.*
 import com.tian.jelajah.utils.Constants.BERITA
@@ -63,15 +64,13 @@ class MainMenuActivity : AppCompatActivity() {
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.my_color)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-
+        ServiceHelper.runWorker(this)
         onView()
         setItemMenu()
 
-        viewModel._jadwalSholat(preference.locationLatLongi!!)
     }
 
     private fun onView() = binding.run {
-        txtCurrentLocation.text = preference.city
 
         rvMenus.apply {
             layoutManager = GridLayoutManager(context, 2)
@@ -100,23 +99,13 @@ class MainMenuActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        binding.txtCurrentLocation.text = preference.city
+        viewModel._jadwalSholat(preference.locationLatLongi!!)
         viewModel.prayers()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-
-        viewModel.prayers()
-        viewModel.responsePrayers.observe(this) {
-            it?.let { list ->
-                prayers = list.run {
-                    val prayers = ArrayList<Prayer>()
-                    forEach { prayer ->  prayers.add(prayer.copy(alarm = preference.notifications.find { notify -> notify == prayer.name } != null)) }
-                    return@run prayers
-                }
-                updatePrayer(prayers!!)
-            }
-        }
 
         viewModel.responseJadwalSholat.observe(this){
             when(it) {
@@ -136,6 +125,17 @@ class MainMenuActivity : AppCompatActivity() {
                     }
                     updatePrayer(it.data)
                 }
+            }
+        }
+
+        viewModel.responsePrayers.observe(this) {
+            it?.let { list ->
+                prayers = list.run {
+                    val prayers = ArrayList<Prayer>()
+                    forEach { prayer ->  prayers.add(prayer.copy(alarm = preference.notifications.find { notify -> notify == prayer.name } != null)) }
+                    return@run prayers
+                }
+                updatePrayer(prayers!!)
             }
         }
     }

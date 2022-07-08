@@ -10,9 +10,12 @@ import android.viewbinding.library.activity.viewBinding
 import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.databinding.ActivitySplashBinding
 import com.tian.jelajah.receiver.ReminderReceiver
-import com.tian.jelajah.services.LocationService
+import com.tian.jelajah.services.ServiceHelper
 import com.tian.jelajah.ui.menu.MainMenuActivity
+import com.tian.jelajah.utils.Constants.LOCATION_WORKER
+import com.tian.jelajah.services.GpsHelper
 import com.tian.jelajah.utils.gotoActivityNewTask
+import com.tian.jelajah.utils.isWorkScheduled
 import kotlinx.coroutines.*
 import java.io.IOException
 
@@ -20,14 +23,17 @@ import java.io.IOException
 class SplashActivity : AppCompatActivity() {
 
     val preference: Preference by lazy { Preference(this) }
-    val gps: LocationService by lazy { LocationService(this) }
     private val binding: ActivitySplashBinding by viewBinding()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         Log.e("SplashActivity", "isReminder ${ReminderReceiver.isReminder(this)}")
         if (!ReminderReceiver.isReminder(this)) ReminderReceiver.updateAlarm(this)
-        loadLatLong()
+
+        if(preference.isInitialize && !isWorkScheduled(this, LOCATION_WORKER))
+            ServiceHelper.runWorker(this)
+        else loadLatLong()
+
         countDownTimer.start()
     }
 
@@ -46,24 +52,17 @@ class SplashActivity : AppCompatActivity() {
     private fun loadLatLong() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                if (gps.location == null) {
-                    if (gps.retry()) {
-                        delay(1000)
-                        loadLatLong()
-                    }
-                }
-                val longi = gps.location!!.longitude
-                val lat = gps.location!!.latitude
-
+                val latAndLong = preference.locationLatLongi?.split("|")
+                val lat = latAndLong?.get(0)?.toDouble()
+                val longi = latAndLong?.get(1)?.toDouble()
                 @Suppress("BlockingMethodInNonBlockingContext")
                 val address =
-                    LocationService.getLocationAddress(this@SplashActivity, lat, longi)
+                    GpsHelper.getLocationAddress(this@SplashActivity, lat!!, longi!!)
                 address?.let {
                     Log.e("SplashActivity", "loadLatLong: ${it.subAdminArea} | $longi | $lat")
-                    val latAndLong = "$lat|$longi"
-                    preference.locationLatLongi = latAndLong
+                    val latAndLong = preference.locationLatLongi
+
                     preference.city = it.subAdminArea
-                    gps.stopUsingGPS()
                 }
                 preference.isUpdateLocation = address != null
 

@@ -10,6 +10,7 @@
     <string name="find_location">Find Location…</string>
     <string name="surah">Surah</string>
     <string name="favorite_surah">Surah Favorite</string>
+    <string name="loading">Loading…</string>
 
     <string name="init_permission_locate">Aplikasi membutuhkan lokasi Anda untuk menghitung waktu sholat yang akurat</string>
     <string name="locate_me">Temukan aku</string>

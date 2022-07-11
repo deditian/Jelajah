@@ -1,11 +1,9 @@
 package com.tian.jelajah.receiver
 
 import android.app.*
-import android.content.BroadcastReceiver
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -44,7 +42,6 @@ class ReminderReceiver : BroadcastReceiver() {
         private const val EXTRA_PRAYER_ID = "extra_id"
 
         fun enableReminder(context: Context, timeBefore: Long = Date().time) {
-            Log.e("TAG", "enableReminder: assdasd", )
             val db = AppDatabase.newInstance(context)
             val preference = Preference(context)
             val prayerUtil = PrayerUtils(preference)
@@ -150,6 +147,7 @@ class ReminderReceiver : BroadcastReceiver() {
     lateinit var repository: CommonRepository
 
     override fun onReceive(context: Context, intent: Intent) {
+        Log.e("TAG", "onReceive: AlarmSchedule Active")
         repository = CommonRepository(context.applicationContext as Application)
         db = AppDatabase.newInstance(context)
         preference = Preference(context)
@@ -221,10 +219,13 @@ class ReminderReceiver : BroadcastReceiver() {
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                         PendingIntent.FLAG_UPDATE_CURRENT
                 )
+        val soundUri =
+            Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.packageName + "/" + R.raw.adhan_trimmed)
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications)
             .setContentTitle(title)
-                .setContentText(msg)
+            .setSound(soundUri)
+            .setContentText(msg)
             .setStyle(NotificationCompat.BigTextStyle().bigText(msg))
             .setAutoCancel(true).setContentIntent(pendingIntent)
 

@@ -1,38 +1,32 @@
 package com.tian.jelajah.ui.menu
 
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
-import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
-import android.content.IntentSender
-import android.content.pm.PackageManager
 import android.graphics.Color
-import android.location.Geocoder
-import android.location.Location
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.viewbinding.library.activity.viewBinding
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.GridLayoutManager
-import com.github.razir.progressbutton.hideProgress
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.Task
 import com.tian.jelajah.R
 import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.databinding.ActivityMainMenuBinding
 import com.tian.jelajah.model.Menus
 import com.tian.jelajah.model.Prayer
+import com.tian.jelajah.receiver.AlarmSchedule.setMultipleAlarms
 import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.repositories.ApiResponse
 import com.tian.jelajah.services.ServiceHelper
@@ -47,9 +41,8 @@ import com.tian.jelajah.utils.Constants.QURAN
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.IOException
 import java.util.*
-import javax.inject.Inject
+
 
 class MainMenuActivity : AppCompatActivity() {
     private val binding : ActivityMainMenuBinding by viewBinding()
@@ -71,7 +64,7 @@ class MainMenuActivity : AppCompatActivity() {
     }
 
     private fun onView() = binding.run {
-
+        viewModel._jadwalSholat(preference.locationLatLongi!!)
         rvMenus.apply {
             layoutManager = GridLayoutManager(context, 2)
             adapter = this@MainMenuActivity.adapter
@@ -99,8 +92,6 @@ class MainMenuActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        binding.txtCurrentLocation.text = preference.city
-        viewModel._jadwalSholat(preference.locationLatLongi!!)
         viewModel.prayers()
     }
 
@@ -115,6 +106,7 @@ class MainMenuActivity : AppCompatActivity() {
                 }
                 ApiResponse.Loading -> {
                     showDialogProgress()
+                    binding.txtCurrentLocation.text = getString(R.string.loading)
                 }
                 is ApiResponse.Success -> {
                     hideDialogProgress()
@@ -124,10 +116,12 @@ class MainMenuActivity : AppCompatActivity() {
                         return@run prayers
                     }
                     updatePrayer(it.data)
+                    binding.txtCurrentLocation.text = preference.city
                 }
             }
         }
 
+        viewModel.prayers()
         viewModel.responsePrayers.observe(this) {
             it?.let { list ->
                 prayers = list.run {

@@ -40,6 +40,8 @@ class InitialActivity : AppCompatActivity(), MultiplePermissionsListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val TAG = this::class.java.simpleName
     private val REQUESTPERMISSIONLOCATION = 9000
+    private val list: ArrayList<String> by lazy { ArrayList(preference.alarmCorrectionTime) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,6 +118,9 @@ class InitialActivity : AppCompatActivity(), MultiplePermissionsListener {
                 address?.let {
                     Log.e("TAG", "loadAddress: ${it.subAdminArea} | $longi | $lat")
                     preference.city = it.subAdminArea
+                    val alarmCorrection = arrayOf("0","0","0","0","0")
+                    alarmCorrection.forEach { cor -> list.add(cor) }
+                    preference.alarmCorrectionTime = list
                     preference.notifications = arrayListOf("imsak","fajr","sunrise","dhuha","dhuhr","asr","maghrib","isha")
                 }
                 GlobalScope.launch(Dispatchers.Main) {

@@ -9,6 +9,7 @@ import android.util.Log
 import android.viewbinding.library.activity.viewBinding
 import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.databinding.ActivitySplashBinding
+import com.tian.jelajah.receiver.AlarmSchedule.setMultipleAlarms
 import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.services.ServiceHelper
 import com.tian.jelajah.ui.menu.MainMenuActivity

@@ -22,11 +22,11 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.gms.location.*
 import com.tian.jelajah.R
+import com.tian.jelajah.base.BaseActivty
 import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.databinding.ActivityMainMenuBinding
 import com.tian.jelajah.model.Menus
 import com.tian.jelajah.model.Prayer
-import com.tian.jelajah.receiver.AlarmSchedule.setMultipleAlarms
 import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.repositories.ApiResponse
 import com.tian.jelajah.services.ServiceHelper
@@ -38,21 +38,22 @@ import com.tian.jelajah.utils.Constants.PAHLAWAN
 import com.tian.jelajah.utils.Constants.PESANTREN
 import com.tian.jelajah.utils.Constants.PUASA
 import com.tian.jelajah.utils.Constants.QURAN
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-
-class MainMenuActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class MainMenuActivity : BaseActivty() {
     private val binding : ActivityMainMenuBinding by viewBinding()
     private val viewModel: MainMenuViewModel by viewModels()
     private val TAG = this::class.java.simpleName
     private var countDownTimer: CountDownTimer? = null
     private var prayers: List<Prayer>? = null
     private val preference: Preference by lazy { Preference(this) }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+    override fun initData(savedInstanceState: Bundle?) {
         setContentView(binding.root)
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.my_color)
@@ -60,11 +61,9 @@ class MainMenuActivity : AppCompatActivity() {
         ServiceHelper.runWorker(this)
         onView()
         setItemMenu()
-
     }
 
     private fun onView() = binding.run {
-        viewModel._jadwalSholat(preference.locationLatLongi!!)
         rvMenus.apply {
             layoutManager = GridLayoutManager(context, 2)
             adapter = this@MainMenuActivity.adapter
@@ -92,34 +91,12 @@ class MainMenuActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        viewModel._jadwalSholat(preference.locationLatLongi!!)
         viewModel.prayers()
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-
-        viewModel.responseJadwalSholat.observe(this){
-            when(it) {
-                is ApiResponse.Error -> {
-                    hideDialogProgress()
-                    Log.e(TAG, "onCreate error: ${it.error}" )
-                }
-                ApiResponse.Loading -> {
-                    showDialogProgress()
-                    binding.txtCurrentLocation.text = getString(R.string.loading)
-                }
-                is ApiResponse.Success -> {
-                    hideDialogProgress()
-                    prayers = it.data.run {
-                        val prayers = ArrayList<Prayer>()
-                        forEach { prayer ->  prayers.add(prayer) }
-                        return@run prayers
-                    }
-                    updatePrayer(it.data)
-                    binding.txtCurrentLocation.text = preference.city
-                }
-            }
-        }
 
         viewModel.prayers()
         viewModel.responsePrayers.observe(this) {
@@ -132,17 +109,31 @@ class MainMenuActivity : AppCompatActivity() {
                 updatePrayer(prayers!!)
             }
         }
+
+        viewModel.responseJadwalSholat.observe(this){
+            when(it) {
+                is ApiResponse.Error -> {
+                    hideProgressDialog()
+                    Log.e(TAG, "onCreate error: ${it.error}" )
+                }
+                ApiResponse.Loading -> {
+                    showProgressDialog()
+                    binding.txtCurrentLocation.text = getString(R.string.loading)
+                }
+                is ApiResponse.Success -> {
+                    hideProgressDialog()
+                    prayers = it.data.run {
+                        val prayers = ArrayList<Prayer>()
+                        forEach { prayer ->  prayers.add(prayer) }
+                        return@run prayers
+                    }
+                    updatePrayer(it.data)
+                    binding.txtCurrentLocation.text = preference.city
+                }
+            }
+        }
+
     }
-
-    fun showDialogProgress(){
-        binding.pbMenu.spinKit.visibility = View.VISIBLE
-    }
-
-    fun hideDialogProgress (){
-        binding.pbMenu.spinKit.visibility = View.GONE
-    }
-
-
 
     private fun updatePrayer(prayer : List<Prayer>) {
         prayer.forEach {

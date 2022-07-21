@@ -27,10 +27,6 @@ import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.databinding.FragmentDialogAdzanBinding
 import com.tian.jelajah.model.Prayer
 import com.tian.jelajah.ui.menu.MainMenuViewModel
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -71,7 +67,6 @@ class AdzanDialogFragment(private val time: Long, private val callbackDismiss: (
     }
 
     override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
 

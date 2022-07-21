@@ -1,19 +1,20 @@
 package com.tian.jelajah.ui.menu
 
-import android.app.Application
+import android.app.Activity
 import androidx.lifecycle.*
-import com.tian.jelajah.model.JadwalSholatRequest
+import com.tian.jelajah.repositories.location.LocationTracker
 import com.tian.jelajah.model.Prayer
 import com.tian.jelajah.repositories.CommonRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.concurrent.CountDownLatch
+import javax.inject.Inject
 
-class MainMenuViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = CommonRepository(application)
+@HiltViewModel
+class MainMenuViewModel @Inject constructor(
+    val repository : CommonRepository,
+    val locationTracker: LocationTracker) : ViewModel() {
 
     private var _jadwalSholat = MutableLiveData<String>()
-
     val responseJadwalSholat = Transformations.switchMap(_jadwalSholat) { repository.getJadwalSholat(it) }
 
     fun _jadwalSholat(latAndLong : String) = viewModelScope.launch {
@@ -27,4 +28,17 @@ class MainMenuViewModel(application: Application) : AndroidViewModel(application
     fun prayers(nextDate: String = "")  = viewModelScope.launch {
         prayers.postValue(nextDate)
     }
+
+    private val location = MutableLiveData<Activity>()
+    val responseLocation = Transformations.switchMap(location) { locationTracker.getCurrentLocation(it) }
+
+    fun location(activity: Activity)  = viewModelScope.launch {
+        location.value = activity
+    }
+
+    fun stopLocation(activity: Activity) = locationTracker.stopUpdateLocation(activity)
+
+
+
+
 }

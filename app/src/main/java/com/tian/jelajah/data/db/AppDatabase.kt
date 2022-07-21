@@ -14,7 +14,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun prayerDao() : PrayerDao
 
     companion object {
-        private const val DATABASE_NAME = "app-database.db"
+        const val DATABASE_NAME = "app-database.db"
 
         fun newInstance(context: Context) : AppDatabase {
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME).build()

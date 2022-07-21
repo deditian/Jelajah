@@ -3,18 +3,25 @@ package com.tian.jelajah.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Parcelable
 import android.util.Log
-import androidx.core.app.ActivityCompat
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.github.ybq.android.spinkit.SpinKitView
+import com.github.ybq.android.spinkit.SpriteFactory
+import com.github.ybq.android.spinkit.Style
 import com.google.common.util.concurrent.ListenableFuture
 import com.tian.jelajah.R
 import com.tian.jelajah.model.DataJadwal
@@ -25,46 +32,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutionException
 import kotlin.reflect.KClass
-
-fun Activity.checkAndRequestPermission(
-    title: String, message: String,
-    manifestPermission: String, requestCode: Int,
-    action: () -> Unit
-) {
-    val permissionStatus = ContextCompat.checkSelfPermission(applicationContext, manifestPermission)
-
-    if (permissionStatus == PackageManager.PERMISSION_DENIED) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, manifestPermission)) {
-            applicationContext.showConfirmDialog(title, message) {
-                requestPermission(manifestPermission, requestCode)
-            }
-        } else {
-            // No explanation needed -> request the permission
-            requestPermission(manifestPermission, requestCode)
-        }
-    } else {
-        action()
-    }
-}
-
-fun Activity.requestPermission(manifestPermission: String, requestCode: Int) {
-    ActivityCompat.requestPermissions(this, arrayOf(manifestPermission), requestCode)
-}
-
-fun Context.showConfirmDialog(title: String, message: String, actionIfAgree: () -> Unit) {
-    val alertDialog = AlertDialog.Builder(this).create()
-    alertDialog.setTitle(title)
-    alertDialog.setMessage(message)
-    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel") { dialog, _ ->
-        dialog.dismiss()
-    }
-    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Ok") { dialog, _ ->
-        actionIfAgree()
-        dialog.dismiss()
-    }
-    alertDialog.show()
-}
-
 
 fun <K: Activity> Activity.gotoActivity(klass: KClass<K>) {
     startActivity(Intent(this, klass.java))
@@ -223,4 +190,42 @@ fun isWorkScheduled(context: Context, tag: String): Boolean {
         e.printStackTrace()
         false
     }
+}
+
+fun View.show() {
+    visibility = View.VISIBLE
+}
+
+fun View.hide() {
+    visibility = View.GONE
+}
+
+fun View.invisible() {
+    visibility = View.INVISIBLE
+}
+
+fun Activity.isNetworkAvailable(): Boolean {
+    val manager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val capabilities = manager.getNetworkCapabilities(manager.activeNetwork)
+        if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                return true
+            }
+        }
+    } else {
+        try {
+            val activeNetworkInfo = manager.activeNetworkInfo
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    return false
 }

@@ -2,12 +2,25 @@ package com.tian.jelajah.di
 
 
 
+import android.app.Application
+import android.content.Context
+import androidx.room.Room
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.tian.jelajah.BuildConfig
-import com.tian.jelajah.data.api.ApiServices
+import com.tian.jelajah.data.api.JadwalServices
+import com.tian.jelajah.data.api.QuranServices
+import com.tian.jelajah.data.db.AppDatabase
+import com.tian.jelajah.data.db.AppDatabase.Companion.DATABASE_NAME
 import com.tian.jelajah.utils.Constants
 import com.tian.jelajah.utils.Pref
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -16,27 +29,44 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
+import javax.inject.Qualifier
+import javax.inject.Singleton
 
+@Module
+@InstallIn(SingletonComponent::class)
 class AppModule {
-    companion object {
 
-        private var appModule: AppModule? = null
 
-        @JvmStatic
-        fun getInstance() : AppModule {
-            if (appModule == null) appModule = AppModule()
-
-            return appModule!!
-        }
+    @Provides
+    @Singleton
+    fun provideFusedLocationProviderClient(app: Application): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(app)
     }
 
-    fun provideApiJadwalService(): ApiServices {
-        return buildClient(BuildConfig.BASE_URL_JADWAL).create(ApiServices::class.java)
+    @Provides
+    @Singleton
+    fun provideApiJadwalService(): JadwalServices {
+        return buildClient(BuildConfig.BASE_URL_JADWAL).create(JadwalServices::class.java)
     }
 
-    fun provideApiQuranService(): ApiServices {
-        return buildClient(BuildConfig.BASE_URL_QURAN).create(ApiServices::class.java)
+    @Provides
+    @Singleton
+    fun provideApiQuranService(): QuranServices {
+        return buildClient(BuildConfig.BASE_URL_QURAN).create(QuranServices::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideRoomInstance(@ApplicationContext context: Context) = Room.databaseBuilder(
+        context,
+        AppDatabase::class.java,
+        DATABASE_NAME
+    ).fallbackToDestructiveMigration().build()
+
+    @Singleton
+    @Provides
+    fun provideAppDao(db: AppDatabase) = db.prayerDao()
 
     private fun buildClient(baseUrl: String): Retrofit {
         val gson = GsonBuilder().setLenient().create()

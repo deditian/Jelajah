@@ -4,9 +4,7 @@ package com.tian.jelajah.base
 import android.app.Application
 import com.tian.jelajah.BuildConfig
 import com.tian.jelajah.utils.Pref
-import dagger.android.AndroidInjection.inject
-import dagger.android.AndroidInjector
-import dagger.android.DaggerApplication
+import dagger.hilt.android.HiltAndroidApp
 
 
 abstract class BaseApp : Application() {

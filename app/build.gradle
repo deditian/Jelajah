@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -88,12 +89,20 @@ dependencies {
     // view binding helper
     implementation 'com.github.yogacp:android-viewbinding:1.0.3'
 
-    //dagger
-    def daggerVer = 2.27
-    implementation "com.google.dagger:dagger:$daggerVer"
-    implementation "com.google.dagger:dagger-android-support:$daggerVer"
-    kapt "com.google.dagger:dagger-android-processor:$daggerVer"
-    kapt "com.google.dagger:dagger-compiler:$daggerVer"
+//    //dagger
+//    def daggerVer = 2.27
+//    implementation "com.google.dagger:dagger:$daggerVer"
+//    implementation "com.google.dagger:dagger-android-support:$daggerVer"
+//    kapt "com.google.dagger:dagger-android-processor:$daggerVer"
+//    kapt "com.google.dagger:dagger-compiler:$daggerVer"
+
+    //Dagger - Hilt
+    implementation "com.google.dagger:hilt-android:2.40.5"
+    kapt "com.google.dagger:hilt-android-compiler:2.40.5"
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
 
     //room
     implementation "androidx.room:room-runtime:2.5.0-alpha02"

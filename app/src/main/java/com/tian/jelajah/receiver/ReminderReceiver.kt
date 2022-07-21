@@ -13,17 +13,15 @@ import com.tian.jelajah.R
 import com.tian.jelajah.data.db.AppDatabase
 import com.tian.jelajah.data.pref.Preference
 import com.tian.jelajah.model.Prayer
-import com.tian.jelajah.repositories.CommonRepository
+import com.tian.jelajah.repositories.CommonRepositoryImpl
 import com.tian.jelajah.ui.adzan.RingAdzanActivity
 import com.tian.jelajah.ui.player.PrayerTimeActivity
 import com.tian.jelajah.utils.Constants.EXTRA_PRAYER_NOW
 import com.tian.jelajah.utils.PrayerUtils
 import com.tian.jelajah.utils.dateFormat
 import com.tian.jelajah.utils.nameResource
-import dagger.android.DaggerBroadcastReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -142,15 +140,17 @@ class ReminderReceiver : BroadcastReceiver() {
     }
 
 
+    @Inject
     lateinit var db: AppDatabase
+
+    @Inject
     lateinit var preference: Preference
-    lateinit var repository: CommonRepository
+
+    @Inject
+    lateinit var repositoryImpl: CommonRepositoryImpl
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.e("TAG", "onReceive: AlarmSchedule Active")
-        repository = CommonRepository(context.applicationContext as Application)
-        db = AppDatabase.newInstance(context)
-        preference = Preference(context)
         val prayerUtil = PrayerUtils(preference)
 
         if (intent.action == ACTION_REMINDER) {
@@ -245,7 +245,7 @@ class ReminderReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             val prayer = db.prayerDao().getNext(time)
             if (prayer == null) {
-                repository.loadApiPrayer(dateFormat("yyyy-MM-dd", Date().time + 1000 * 60 * 60 * 24))?.let {
+                repositoryImpl.loadApiPrayer(dateFormat("yyyy-MM-dd", Date().time + 1000 * 60 * 60 * 24))?.let {
                     enableReminder(context, time)
                 }
             } else enableReminder(context, time)

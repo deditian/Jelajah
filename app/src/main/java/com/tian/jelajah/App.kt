@@ -6,8 +6,10 @@ import android.os.Bundle
 import com.tian.jelajah.base.BaseApp
 import com.tian.jelajah.utils.Constants
 import com.tian.jelajah.utils.Pref
+import dagger.hilt.android.HiltAndroidApp
 import java.util.*
 
+@HiltAndroidApp
 class App  : BaseApp(){
     override fun onCreate() {
         super.onCreate()

@@ -1,5 +1,7 @@
 package com.tian.jelajah.utils
 
+import android.Manifest
+
 
 object Constants {
     const val LANGUAGE = "language"
@@ -11,4 +13,5 @@ object Constants {
     const val PAHLAWAN = "Pahlawan Nasional Indonesia"
     const val EXTRA_PRAYER_NOW = "extra_prayer_now"
     const val LOCATION_WORKER = "location_worker"
+    const val REQUESTPERMISSIONLOCATION = 9000
 }

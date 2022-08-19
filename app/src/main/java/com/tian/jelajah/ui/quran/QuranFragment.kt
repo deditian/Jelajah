@@ -9,7 +9,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.tian.jelajah.R
 import com.tian.jelajah.repositories.ApiResponse
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class QuranFragment : Fragment() {
 
     private val viewModel: QuranViewModel by activityViewModels()

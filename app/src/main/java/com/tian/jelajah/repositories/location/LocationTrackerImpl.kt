@@ -10,17 +10,15 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
 import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.repositories.LocalResponse
 import com.tian.jelajah.utils.Constants.REQUESTPERMISSIONLOCATION
-import com.tian.jelajah.utils.loge
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -29,7 +27,7 @@ import javax.inject.Inject
 class LocationTrackerImpl @Inject constructor(
     private val locationClient: FusedLocationProviderClient,
     private val application: Application,
-    private val preference: Preference
+    private val preference: Preferences
 ): LocationTracker {
 
     private val TAG = this::class.java.simpleName

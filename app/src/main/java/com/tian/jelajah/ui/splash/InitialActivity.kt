@@ -9,10 +9,9 @@ import android.util.Log
 import android.viewbinding.library.activity.viewBinding
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.tian.jelajah.base.BaseActivty
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.databinding.ActivityInitialBinding
 import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.repositories.ApiResponse
@@ -20,10 +19,7 @@ import com.tian.jelajah.repositories.LocalResponse
 import com.tian.jelajah.ui.menu.MainMenuActivity
 import com.tian.jelajah.services.GpsHelper
 import com.tian.jelajah.ui.menu.MainMenuViewModel
-import com.tian.jelajah.utils.alert
 import com.tian.jelajah.utils.gotoActivityNewTask
-import com.tian.jelajah.utils.isNetworkAvailable
-import com.tian.jelajah.utils.loge
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.io.IOException
@@ -31,7 +27,7 @@ import java.io.IOException
 @AndroidEntryPoint
 class InitialActivity : BaseActivty() {
     private val binding : ActivityInitialBinding by viewBinding()
-    private val preference : Preference by lazy { Preference(this) }
+    private val preference : Preferences by lazy { Preferences(this) }
     private val TAG = this::class.java.simpleName
     private val list: ArrayList<String> by lazy { ArrayList(preference.alarmCorrectionTime) }
     private val viewModel: MainMenuViewModel by viewModels()

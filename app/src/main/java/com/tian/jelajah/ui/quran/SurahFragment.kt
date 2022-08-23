@@ -12,7 +12,7 @@ import com.tian.jelajah.repositories.ApiResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class QuranFragment : Fragment() {
+class SurahFragment : Fragment() {
 
     private val viewModel: QuranViewModel by activityViewModels()
     private val TAG = this::class.java.simpleName

@@ -2,28 +2,20 @@ package com.tian.jelajah.ui.menu
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.viewbinding.library.activity.viewBinding
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.gms.location.*
 import com.tian.jelajah.R
 import com.tian.jelajah.base.BaseActivty
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.databinding.ActivityMainMenuBinding
 import com.tian.jelajah.model.Menus
 import com.tian.jelajah.model.Prayer
@@ -51,7 +43,7 @@ class MainMenuActivity : BaseActivty() {
     private val TAG = this::class.java.simpleName
     private var countDownTimer: CountDownTimer? = null
     private var prayers: List<Prayer>? = null
-    private val preference: Preference by lazy { Preference(this) }
+    private val preference: Preferences by lazy { Preferences(this) }
 
     override fun initData(savedInstanceState: Bundle?) {
         setContentView(binding.root)
@@ -91,8 +83,8 @@ class MainMenuActivity : BaseActivty() {
 
     override fun onResume() {
         super.onResume()
-        viewModel._jadwalSholat(preference.locationLatLongi!!)
         viewModel.prayers()
+        viewModel._jadwalSholat(preference.locationLatLongi!!)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {

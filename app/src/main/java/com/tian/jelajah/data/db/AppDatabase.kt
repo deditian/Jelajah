@@ -8,7 +8,7 @@ import com.tian.jelajah.model.Prayer
 
 
 @Database(entities = [
-    Prayer::class], version = 1, exportSchema = true)
+    Prayer::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun prayerDao() : PrayerDao

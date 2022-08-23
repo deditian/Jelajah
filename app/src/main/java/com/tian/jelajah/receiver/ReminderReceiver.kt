@@ -11,7 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.tian.jelajah.R
 import com.tian.jelajah.data.db.AppDatabase
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.model.Prayer
 import com.tian.jelajah.repositories.CommonRepositoryImpl
 import com.tian.jelajah.ui.adzan.RingAdzanActivity
@@ -41,7 +41,7 @@ class ReminderReceiver : BroadcastReceiver() {
 
         fun enableReminder(context: Context, timeBefore: Long = Date().time) {
             val db = AppDatabase.newInstance(context)
-            val preference = Preference(context)
+            val preference = Preferences(context)
             val prayerUtil = PrayerUtils(preference)
             val now = Date().time
             val alarmTime = preference.alarmTimeOut * 60000
@@ -58,7 +58,7 @@ class ReminderReceiver : BroadcastReceiver() {
             }
         }
 
-        private suspend fun getNextPrayer(db: AppDatabase, preference: Preference, timeBefore: Long) : Prayer? {
+        private suspend fun getNextPrayer(db: AppDatabase, preference: Preferences, timeBefore: Long) : Prayer? {
             db.prayerDao().getNext(timeBefore)?.let { prayer ->
                 Log.e("TAG", "getNextPrayer: preference.notifications ${preference.notifications}",)
                 if (preference.notifications.find { it == prayer.name } != null){
@@ -144,7 +144,7 @@ class ReminderReceiver : BroadcastReceiver() {
     lateinit var db: AppDatabase
 
     @Inject
-    lateinit var preference: Preference
+    lateinit var preference: Preferences
 
     @Inject
     lateinit var repositoryImpl: CommonRepositoryImpl

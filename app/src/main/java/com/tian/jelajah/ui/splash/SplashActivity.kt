@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.viewbinding.library.activity.viewBinding
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.databinding.ActivitySplashBinding
 import com.tian.jelajah.receiver.ReminderReceiver
 import com.tian.jelajah.services.ServiceHelper
@@ -24,7 +24,7 @@ import java.io.IOException
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
-    val preference: Preference by lazy { Preference(this) }
+    val preference: Preferences by lazy { Preferences(this) }
     private val binding: ActivitySplashBinding by viewBinding()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

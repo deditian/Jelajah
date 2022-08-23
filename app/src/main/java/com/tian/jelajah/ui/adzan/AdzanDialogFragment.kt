@@ -2,45 +2,27 @@ package com.tian.jelajah.ui.adzan
 
 import android.content.Context
 import android.content.Context.TELEPHONY_SERVICE
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.os.Build
 import android.os.Bundle
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.viewbinding.library.fragment.viewBinding
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
-import com.tian.jelajah.R
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.databinding.FragmentDialogAdzanBinding
 import com.tian.jelajah.model.Prayer
 import com.tian.jelajah.ui.menu.MainMenuViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
-import java.util.*
-import javax.inject.Inject
-import kotlin.math.ceil
 
 
 class AdzanDialogFragment(private val time: Long, private val callbackDismiss: (() -> Unit?)? = null) : DialogFragment(), MediaPlayer.OnCompletionListener {
 
 
-    lateinit var preference: Preference
+    lateinit var preference: Preferences
     private var mMediaPlayer: MediaPlayer? = null
     private var mAudioManager: AudioManager? = null
     private var prayer: Prayer? = null

@@ -42,7 +42,7 @@
         <activity
             android:name=".ui.quran.QuranActivity"
             android:exported="false"
-            android:theme="@style/Theme.Jelajah" />
+            android:theme="@style/Theme.Jelajah.NoActionBar" />
         <activity
             android:name=".ui.menu.MainMenuActivity"
             android:exported="false" />

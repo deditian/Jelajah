@@ -8,7 +8,7 @@ import com.google.gson.Gson
 import com.tian.jelajah.data.api.JadwalServices
 import com.tian.jelajah.data.api.QuranServices
 import com.tian.jelajah.data.db.AppDatabase
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.model.*
 import com.tian.jelajah.utils.PrayerUtils
 import com.tian.jelajah.utils.convertToList
@@ -24,7 +24,7 @@ import kotlin.reflect.KClass
 class CommonRepositoryImpl @Inject constructor(
     private val jadwalService: JadwalServices,
     private val quranService: QuranServices,
-    private val preference : Preference,
+    private val preference : Preferences,
     private val appDatabase : AppDatabase) : CommonRepository {
 
     private val TAG = this::class.java.simpleName

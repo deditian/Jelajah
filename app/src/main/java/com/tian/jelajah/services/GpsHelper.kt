@@ -5,7 +5,7 @@ import android.content.Context
 import android.location.*
 import android.os.Bundle
 import android.util.Log
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.utils.logi
 import java.io.IOException
 import java.util.*
@@ -25,7 +25,7 @@ object GpsHelper {
 
     @SuppressLint("ServiceCast", "MissingPermission")
     fun getLocation(context: Context) {
-        var preference = Preference(context)
+        var preference = Preferences(context)
         var locationGps: Location? = null
         var locationNetwork: Location? = null
         val locationManager = context.applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager

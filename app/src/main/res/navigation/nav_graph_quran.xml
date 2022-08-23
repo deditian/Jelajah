@@ -3,11 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_quran"
-    app:startDestination="@id/quranFragment">
+    app:startDestination="@id/surah">
 
     <fragment
-        android:id="@+id/quranFragment"
-        android:name="com.tian.jelajah.ui.quran.QuranFragment"
-        android:label="fragment_quran"
+        android:id="@+id/surah"
+        android:name="com.tian.jelajah.ui.quran.SurahFragment"
+        android:label="surah"
+        tools:layout="@layout/fragment_quran" />
+    <fragment
+        android:id="@+id/favorite_surah"
+        android:name="com.tian.jelajah.ui.quran.QuranFavoriteFragment"
+        android:label="Favorite surah"
         tools:layout="@layout/fragment_quran" />
 </navigation>

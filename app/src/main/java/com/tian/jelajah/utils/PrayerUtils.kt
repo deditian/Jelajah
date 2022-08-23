@@ -1,9 +1,9 @@
 package com.tian.jelajah.utils
 
-import com.tian.jelajah.data.pref.Preference
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.model.Prayer
 
-class PrayerUtils(private val preference: Preference) {
+class PrayerUtils(private val preference: Preferences) {
 
     fun correctionTimingPrayer(prayer: Prayer) : Prayer {
         val correction = preference.alarmCorrectionTime

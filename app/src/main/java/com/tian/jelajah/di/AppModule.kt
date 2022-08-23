@@ -4,6 +4,7 @@ package com.tian.jelajah.di
 
 import android.app.Application
 import android.content.Context
+import androidx.preference.Preference
 import androidx.room.Room
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -14,6 +15,7 @@ import com.tian.jelajah.data.api.JadwalServices
 import com.tian.jelajah.data.api.QuranServices
 import com.tian.jelajah.data.db.AppDatabase
 import com.tian.jelajah.data.db.AppDatabase.Companion.DATABASE_NAME
+import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.utils.Constants
 import com.tian.jelajah.utils.Pref
 import dagger.Module
@@ -67,6 +69,12 @@ class AppModule {
     @Singleton
     @Provides
     fun provideAppDao(db: AppDatabase) = db.prayerDao()
+
+    @Provides
+    @Singleton
+    fun providePreferences(app: Application): Preferences {
+        return Preferences(app)
+    }
 
     private fun buildClient(baseUrl: String): Retrofit {
         val gson = GsonBuilder().setLenient().create()

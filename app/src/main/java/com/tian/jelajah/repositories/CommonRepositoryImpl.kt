@@ -140,7 +140,6 @@ class CommonRepositoryImpl @Inject constructor(
 
     override fun getListSurah() : LiveData<ApiResponse<List<Surah>>> {
         val result = MutableLiveData<ApiResponse<List<Surah>>>()
-
         result.value = ApiResponse.Loading
 
         quranService.getListSurah().enqueue(enqueue(SurahListResponse::class, {

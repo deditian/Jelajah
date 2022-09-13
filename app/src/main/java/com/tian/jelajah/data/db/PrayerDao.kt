@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.tian.jelajah.model.Prayer
+import com.tian.jelajah.model.Surah
 
 
 @Dao
@@ -35,7 +36,16 @@ interface PrayerDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Prayer>)
 
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    fun insertSurah(list: List<Surah>)
+//
+//    @Query("SELECT * FROM surah WHERE number=:number")
+//    suspend fun getSurahid(number: String): Surah?
+
     @Query("DELETE FROM prayer")
     suspend fun deleteAll()
+
+//    @Query("DELETE FROM surah")
+//    suspend fun deleteSurah()
 
 }

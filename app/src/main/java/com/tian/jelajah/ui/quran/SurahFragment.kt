@@ -34,11 +34,11 @@ class SurahFragment : Fragment() {
                 is ApiResponse.Error -> {
                     Log.e(TAG, "onCreate error: ${it.error}" )
                 }
-                ApiResponse.Loading -> {
+                is ApiResponse.Loading -> {
 
                 }
                 is ApiResponse.Success -> {
-                    Log.e(TAG, "onCreate Success:  ${it.data}" )
+                    Log.e(TAG, "onCreate Success:  ${it}" )
                 }
             }
         }

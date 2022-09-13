@@ -11,8 +11,18 @@
         android:label="surah"
         tools:layout="@layout/fragment_quran" />
     <fragment
-        android:id="@+id/favorite_surah"
+        android:id="@+id/surah1"
         android:name="com.tian.jelajah.ui.quran.QuranFavoriteFragment"
-        android:label="Favorite surah"
+        android:label="@string/s1"
         tools:layout="@layout/fragment_quran" />
+    <fragment
+        android:id="@+id/surah2"
+        android:name="com.tian.jelajah.ui.quran.QuranFavoriteFragment"
+        android:label="@string/s2"
+        tools:layout="@layout/fragment_quran" />
+<!--    <fragment-->
+<!--        android:id="@+id/favorite_surah3"-->
+<!--        android:name="com.tian.jelajah.ui.quran.QuranFavoriteFragment"-->
+<!--        android:label="surah3"-->
+<!--        tools:layout="@layout/fragment_quran" />-->
 </navigation>

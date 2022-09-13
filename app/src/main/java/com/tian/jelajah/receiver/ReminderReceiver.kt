@@ -13,6 +13,7 @@ import com.tian.jelajah.R
 import com.tian.jelajah.data.db.AppDatabase
 import com.tian.jelajah.data.pref.Preferences
 import com.tian.jelajah.model.Prayer
+import com.tian.jelajah.repositories.CommonRepository
 import com.tian.jelajah.repositories.CommonRepositoryImpl
 import com.tian.jelajah.ui.adzan.RingAdzanActivity
 import com.tian.jelajah.ui.player.PrayerTimeActivity
@@ -140,17 +141,15 @@ class ReminderReceiver : BroadcastReceiver() {
     }
 
 
-    @Inject
-    lateinit var db: AppDatabase
+    @Inject lateinit var db: AppDatabase
 
-    @Inject
-    lateinit var preference: Preferences
+    @Inject lateinit var preference: Preferences
 
-    @Inject
-    lateinit var repositoryImpl: CommonRepositoryImpl
+    @Inject lateinit var repository: CommonRepository
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.e("TAG", "onReceive: AlarmSchedule Active")
+        preference = Preferences(context)
         val prayerUtil = PrayerUtils(preference)
 
         if (intent.action == ACTION_REMINDER) {
@@ -245,7 +244,7 @@ class ReminderReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             val prayer = db.prayerDao().getNext(time)
             if (prayer == null) {
-                repositoryImpl.loadApiPrayer(dateFormat("yyyy-MM-dd", Date().time + 1000 * 60 * 60 * 24))?.let {
+                repository.loadApiPrayer(dateFormat("yyyy-MM-dd", Date().time + 1000 * 60 * 60 * 24))?.let {
                     enableReminder(context, time)
                 }
             } else enableReminder(context, time)

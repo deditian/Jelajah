@@ -122,4 +122,6 @@ dependencies {
 
     // work manager
     implementation 'androidx.work:work-runtime-ktx:2.3.2'
+
+    implementation 'com.github.hakobast:dropdown-textview:0.1.1'
 }

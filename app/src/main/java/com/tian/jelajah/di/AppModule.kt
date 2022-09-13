@@ -72,9 +72,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun providePreferences(app: Application): Preferences {
-        return Preferences(app)
-    }
+    fun providePreferences(app: Application): Preferences = Preferences(app)
 
     private fun buildClient(baseUrl: String): Retrofit {
         val gson = GsonBuilder().setLenient().create()

@@ -1,6 +1,9 @@
 package com.tian.jelajah.model
 
 import android.os.Parcelable
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
@@ -11,6 +14,7 @@ data class SurahListResponse (
 ) : GeneralResponse(), Parcelable
 
 @Parcelize
+@Entity
 data class Surah(
     @SerializedName("number")
     val number: String,

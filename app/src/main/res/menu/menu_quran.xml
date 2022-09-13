@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
     <item
         android:id="@+id/surah"
         android:icon="@drawable/ic_launcher_foreground"
+        android:orderInCategory="0"
         android:title="@string/surah" />
-    <item
-        android:id="@+id/favorite_surah"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="@string/favorite_surah" />
+    </group>
+
+    <item android:title="@string/nama_surah">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/surah1"
+                    android:icon="@drawable/ic_launcher_foreground"
+                    android:orderInCategory="1"
+                    android:title="@string/s1" />
+                <item
+                    android:id="@+id/surah2"
+                    android:orderInCategory="2"
+                    android:icon="@drawable/ic_launcher_foreground"
+                    android:title="@string/s2" />
+<!--                <item-->
+<!--                    android:id="@+id/favorite_surah3"-->
+<!--                    android:icon="@drawable/ic_launcher_foreground"-->
+<!--                    android:title="@string/favorite_surah" />-->
+            </group>
+        </menu>
+    </item>
 </menu>

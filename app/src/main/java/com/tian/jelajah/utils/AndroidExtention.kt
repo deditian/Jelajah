@@ -26,6 +26,8 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.tian.jelajah.R
 import com.tian.jelajah.model.DataJadwal
 import com.tian.jelajah.model.Prayer
+import com.tian.jelajah.model.Surah
+import com.tian.jelajah.model.SurahList
 import java.lang.reflect.Modifier
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -117,6 +119,46 @@ fun DataJadwal.convertToList() : List<Prayer> {
         date = tanggal, type = "adzan"))
     return list
 }
+
+//fun Surah.convertToList() : List<SurahList> {
+//    val list = ArrayList<SurahList>()
+//    list.add(SurahList(
+//        name = "imsak",
+//        time = ("$tanggal ${jadwal.Imsak}").dateTimeStringToLong(),
+//        backgroundColor = Color.parseColor("#0f0c29"),
+//        date = tanggal, type = "notify"))
+//    list.add(SurahList(
+//        name = "fajr",
+//        time = ("$tanggal ${jadwal.Subuh}").dateTimeStringToLong(),
+//        backgroundColor = Color.parseColor("#0f0c29"),
+//        date = tanggal, type = "adzan"))
+//    list.add(SurahList(
+//        name = "sunrise",
+//        time = ("$tanggal ${jadwal.Terbit}").dateTimeStringToLong(),
+//        backgroundColor = Color.parseColor("#0f0c29"),
+//        date = tanggal, type = "notify"))
+//    list.add(SurahList(
+//        name = "dhuhr",
+//        time = ("$tanggal ${jadwal.Duhur}").dateTimeStringToLong(),
+//        backgroundColor = Color.parseColor("#0a9de1"),
+//        date = tanggal, type = "adzan"))
+//    list.add(SurahList(
+//        name = "asr",
+//        time = ("$tanggal ${jadwal.Ashar}").dateTimeStringToLong(),
+//        backgroundColor = Color.parseColor("#0a9de1"),
+//        date = tanggal, type = "adzan"))
+//    list.add(SurahList(
+//        name = "maghrib",
+//        time = ("$tanggal ${jadwal.Maghrib}").dateTimeStringToLong(),
+//        backgroundColor = Color.parseColor("#ff5231"),
+//        date = tanggal, type = "adzan"))
+//    list.add(SurahList(
+//        name = "isha",
+//        time = ("$tanggal ${jadwal.Isya}").dateTimeStringToLong(),
+//        backgroundColor = Color.parseColor("#6f4ba9"),
+//        date = tanggal, type = "adzan"))
+//    return list
+//}
 
 fun String.dateTimeStringToLong() : Long {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())

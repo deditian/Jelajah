@@ -35,4 +35,50 @@
 
     <string name="error_permission_location">This application is not given permission to access your location.</string>
 
+    <string-array name="car_array">
+        <item>Audi</item>
+        <item>BMW</item>
+        <item>Benz</item>
+        <item>Ford</item>
+        <item>Toyota</item>
+        <item>Tesla</item>
+        <item>Honda</item>
+        <item>Hyundai</item>
+    </string-array>
+
+    <string name="nama_surah">Nama Surah</string>
+    <string name="s1">Al-Fatihah</string>
+    <string name="s2">Al-Baqarah</string>
+<!--    <string name="s3">Al-Fatihah</string>-->
+<!--    <string name="s4">Al-Fatihah</string>-->
+<!--    <string name="s5">Al-Fatihah</string>-->
+<!--    <string name="s6">Al-Fatihah</string>-->
+<!--    <string name="s7">Al-Fatihah</string>-->
+<!--    <string name="s8">Al-Fatihah</string>-->
+<!--    <string name="s9">Al-Fatihah</string>-->
+<!--    <string name="s10">Al-Fatihah</string>-->
+<!--    <string name="s11">Al-Fatihah</string>-->
+<!--    <string name="s12">Al-Fatihah</string>-->
+<!--    <string name="s13">Al-Fatihah</string>-->
+<!--    <string name="s14">Al-Fatihah</string>-->
+<!--    <string name="s15">Al-Fatihah</string>-->
+<!--    <string name="s16">Al-Fatihah</string>-->
+<!--    <string name="s17">Al-Fatihah</string>-->
+<!--    <string name="s18">Al-Fatihah</string>-->
+<!--    <string name="s19">Al-Fatihah</string>-->
+<!--    <string name="s20">Al-Fatihah</string>-->
+<!--    <string name="s21">Al-Fatihah</string>-->
+<!--    <string name="s22">Al-Fatihah</string>-->
+<!--    <string name="s23">Al-Fatihah</string>-->
+<!--    <string name="s24">Al-Fatihah</string>-->
+<!--    <string name="s25">Al-Fatihah</string>-->
+<!--    <string name="s26">Al-Fatihah</string>-->
+<!--    <string name="s27">Al-Fatihah</string>-->
+<!--    <string name="s28">Al-Fatihah</string>-->
+<!--    <string name="s29">Al-Fatihah</string>-->
+<!--    <string name="s30">Al-Fatihah</string>-->
+<!--    <string name="s31">Al-Fatihah</string>-->
+<!--    <string name="s32">Al-Fatihah</string>-->
+<!--    <string name="s33">Al-Fatihah</string>-->
+
 </resources>
